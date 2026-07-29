@@ -11,6 +11,7 @@ import { useExitListener } from "../../hooks/useExitListener";
 import type { Inventory as InventoryProps } from "../../typings";
 import RightInventory from "./RightInventory";
 import LeftInventory from "./LeftInventory";
+import InventorySideColumn from "./InventorySideColumn";
 import Tooltip from "../utils/Tooltip";
 import { closeTooltip } from "../../store/tooltip";
 import InventoryContext from "./InventoryContext";
@@ -53,6 +54,7 @@ const Inventory: React.FC = () => {
     <>
       <Fade in={inventoryVisible}>
         <div className="inventory-wrapper">
+          <InventorySideColumn />
           <LeftInventory />
           <RightInventory />
           <Tooltip />
@@ -62,7 +64,7 @@ const Inventory: React.FC = () => {
           <WeaponComponentsModal />
         </div>
       </Fade>
-      <InventoryHotbar />
+      {!inventoryVisible && <InventoryHotbar />}
     </>
   );
 };

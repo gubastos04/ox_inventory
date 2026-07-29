@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Inventory, InventoryType } from "../../typings";
-import WeightBar, { getLoadColor } from "../utils/WeightBar";
-import InventorySlot from "./InventorySlot";
-import { getTotalWeight } from "../../helpers";
-import { useAppSelector } from "../../store";
-import { useIntersection } from "../../hooks/useIntersection";
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Inventory } from '../../typings';
+import WeightBar, { getLoadColor } from '../utils/WeightBar';
+import InventorySlot from './InventorySlot';
+import { getTotalWeight } from '../../helpers';
+import { useAppSelector } from '../../store';
+import { useIntersection } from '../../hooks/useIntersection';
 
 const PAGE_SIZE = 30;
 
@@ -16,17 +16,14 @@ const MAX_VISIBLE_ROWS = 5;
 const ROW_HEIGHT_VH = 10.42; // $gridSize (10.2vh) + 0.22vh
 const ROW_GAP_PX = 2; // $gridGap
 
-const getContainerHeight = (rows: number) =>
-  `calc(${rows * ROW_HEIGHT_VH}vh + ${rows * ROW_GAP_PX}px)`;
+const getContainerHeight = (rows: number) => `calc(${rows * ROW_HEIGHT_VH}vh + ${rows * ROW_GAP_PX}px)`;
 
-const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
-  const weight = useMemo(
-    () =>
-      inventory.maxWeight !== undefined
-        ? Math.floor(getTotalWeight(inventory.items) * 1000) / 1000
-        : 0,
-    [inventory.maxWeight, inventory.items],
-  );
+const InventoryGrid: React.FC<{ inventory: Inventory; totalWeight?: number }> = ({ inventory, totalWeight }) => {
+  const weight = useMemo(() => {
+    if (inventory.maxWeight === undefined) return 0;
+    const raw = totalWeight !== undefined ? totalWeight : getTotalWeight(inventory.items);
+    return Math.floor(raw * 1000) / 1000;
+  }, [inventory.maxWeight, inventory.items, totalWeight]);
   const [page, setPage] = useState(0);
   const containerRef = useRef(null);
   const { ref, entry } = useIntersection({ threshold: 0.5 });
@@ -38,37 +35,19 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     }
   }, [entry]);
 
-  // the player's own inventory shows its first 5 slots as a "hotbar row",
-  // visually separated from the rest of the grid — other inventories
-  // (stashes, shops, containers...) render as a single continuous grid
-  const isPlayerInventory = inventory.type === InventoryType.PLAYER;
   const visibleItems = inventory.items.slice(0, (page + 1) * PAGE_SIZE);
-  const hotbarItems = isPlayerInventory ? visibleItems.slice(0, 5) : [];
-  const restItems = isPlayerInventory ? visibleItems.slice(5) : visibleItems;
 
-  // total slot count always matches inventory.items.length (it's padded with empty
-  // slots server-side), so the container can size itself off the real slot count
-  // instead of a hardcoded row number — this is what lets it shrink when an
-  // inventory is configured with fewer slots
-  const restSlotCount = isPlayerInventory
-    ? Math.max(0, inventory.items.length - 5)
-    : inventory.items.length;
-  const rows = Math.min(
-    MAX_VISIBLE_ROWS,
-    Math.max(1, Math.ceil(restSlotCount / GRID_COLS)),
-  );
+  // container sizes itself off the real slot count (padded server-side to
+  // always match inventory.items.length) instead of a hardcoded row number —
+  // this is what lets it shrink when an inventory has fewer slots
+  const rows = Math.min(MAX_VISIBLE_ROWS, Math.max(1, Math.ceil(inventory.items.length / GRID_COLS)));
 
-  const percent = inventory.maxWeight
-    ? (weight / inventory.maxWeight) * 100
-    : 0;
+  const percent = inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0;
   const weightColor = getLoadColor(percent);
 
   return (
     <>
-      <div
-        className="inventory-grid-wrapper"
-        style={{ pointerEvents: isBusy ? "none" : "auto" }}
-      >
+      <div className="inventory-grid-wrapper" style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
         <div className="inventory-grid-header-wrapper">
           <p className="inventory-grid-label">{inventory.label}</p>
           {inventory.maxWeight && (
@@ -81,36 +60,13 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
           )}
         </div>
 
-        {isPlayerInventory && hotbarItems.length > 0 && (
+        <div className="inventory-grid-container" ref={containerRef} style={{ height: getContainerHeight(rows) }}>
           <>
-            <div className="inventory-hotbar-row">
-              {hotbarItems.map((item) => (
-                <InventorySlot
-                  key={`${inventory.type}-${inventory.id}-${item.slot}`}
-                  item={item}
-                  inventoryType={inventory.type}
-                  inventoryGroups={inventory.groups}
-                  inventoryId={inventory.id}
-                />
-              ))}
-            </div>
-            <div className="inventory-grid-divider">
-              <span>Inventário</span>
-            </div>
-          </>
-        )}
-
-        <div
-          className="inventory-grid-container"
-          ref={containerRef}
-          style={{ height: getContainerHeight(rows) }}
-        >
-          <>
-            {restItems.map((item, index) => (
+            {visibleItems.map((item, index) => (
               <InventorySlot
                 key={`${inventory.type}-${inventory.id}-${item.slot}`}
                 item={item}
-                ref={index === restItems.length - 1 ? ref : null}
+                ref={index === visibleItems.length - 1 ? ref : null}
                 inventoryType={inventory.type}
                 inventoryGroups={inventory.groups}
                 inventoryId={inventory.id}
