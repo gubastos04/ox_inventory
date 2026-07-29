@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import useNuiEvent from '../../hooks/useNuiEvent';
-import InventoryControl from './InventoryControl';
 import InventoryHotbar from './InventoryHotbar';
 import { useAppDispatch } from '../../store';
 import { refreshSlots, setAdditionalMetadata, setupInventory } from '../../store/inventory';
@@ -12,6 +11,9 @@ import Tooltip from '../utils/Tooltip';
 import { closeTooltip } from '../../store/tooltip';
 import InventoryContext from './InventoryContext';
 import { closeContextMenu } from '../../store/contextMenu';
+import GiveItemModal from './GiveItemModal';
+import SplitStackModal from './SplitStackModal';
+import WeaponComponentsModal from './WeaponComponentsModal';
 import Fade from '../utils/transitions/Fade';
 
 const Inventory: React.FC = () => {
@@ -45,10 +47,12 @@ const Inventory: React.FC = () => {
       <Fade in={inventoryVisible}>
         <div className="inventory-wrapper">
           <LeftInventory />
-          <InventoryControl />
           <RightInventory />
           <Tooltip />
           <InventoryContext />
+          <GiveItemModal />
+          <SplitStackModal />
+          <WeaponComponentsModal />
         </div>
       </Fade>
       <InventoryHotbar />

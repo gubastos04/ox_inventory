@@ -1,12 +1,14 @@
 import { onUse } from '../../dnd/onUse';
-import { onGive } from '../../dnd/onGive';
 import { onDrop } from '../../dnd/onDrop';
 import { Items } from '../../store/items';
 import { fetchNui } from '../../utils/fetchNui';
 import { Locale } from '../../store/locale';
 import { isSlotWithItem } from '../../helpers';
 import { setClipboard } from '../../utils/setClipboard';
-import { useAppSelector } from '../../store';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { openGiveModal } from '../../store/giveItem';
+import { openSplitModal } from '../../store/splitStack';
+import { openComponentsModal } from '../../store/weaponComponents';
 import React from 'react';
 import { Menu, MenuItem } from '../utils/menu/Menu';
 
@@ -36,6 +38,7 @@ interface ButtonWithIndex extends Button {
 interface GroupedButtons extends Array<Group> {}
 
 const InventoryContext: React.FC = () => {
+  const dispatch = useAppDispatch();
   const contextMenu = useAppSelector((state) => state.contextMenu);
   const item = contextMenu.item;
 
@@ -47,7 +50,13 @@ const InventoryContext: React.FC = () => {
         onUse({ name: item.name, slot: item.slot });
         break;
       case 'give':
-        onGive({ name: item.name, slot: item.slot });
+        isSlotWithItem(item) && dispatch(openGiveModal(item));
+        break;
+      case 'split':
+        isSlotWithItem(item) && dispatch(openSplitModal(item));
+        break;
+      case 'components':
+        isSlotWithItem(item) && dispatch(openComponentsModal(item));
         break;
       case 'drop':
         isSlotWithItem(item) && onDrop({ item: item, inventory: 'player' });
@@ -94,27 +103,21 @@ const InventoryContext: React.FC = () => {
       <Menu>
         <MenuItem onClick={() => handleClick({ action: 'use' })} label={Locale.ui_use || 'Use'} />
         <MenuItem onClick={() => handleClick({ action: 'give' })} label={Locale.ui_give || 'Give'} />
+        {item && isSlotWithItem(item) && item.count > 1 && (
+          <MenuItem onClick={() => handleClick({ action: 'split' })} label={Locale.ui_split || 'Split stack'} />
+        )}
         <MenuItem onClick={() => handleClick({ action: 'drop' })} label={Locale.ui_drop || 'Drop'} />
         {item && item.metadata?.ammo > 0 && (
-          <MenuItem onClick={() => handleClick({ action: 'removeAmmo' })} label={Locale.ui_remove_ammo} />
+          <MenuItem onClick={() => handleClick({ action: 'removeAmmo' })} label={Locale.ui_remove_ammo || 'Remove ammo'} />
         )}
         {item && item.metadata?.serial && (
           <MenuItem
             onClick={() => handleClick({ action: 'copy', serial: item.metadata?.serial })}
-            label={Locale.ui_copy}
+            label={Locale.ui_copy || 'Copy serial number'}
           />
         )}
-        {item && item.metadata?.components && item.metadata?.components.length > 0 && (
-          <Menu label={Locale.ui_removeattachments}>
-            {item &&
-              item.metadata?.components.map((component: string, index: number) => (
-                <MenuItem
-                  key={index}
-                  onClick={() => handleClick({ action: 'remove', component, slot: item.slot })}
-                  label={Items[component]?.label || ''}
-                />
-              ))}
-          </Menu>
+        {item && item.metadata?.components !== undefined && (
+          <MenuItem onClick={() => handleClick({ action: 'components' })} label={Locale.ui_components || 'Componentes'} />
         )}
         {((item && item.name && Items[item.name]?.buttons?.length) || 0) > 0 && (
           <>

@@ -1,35 +1,34 @@
 import React, { useMemo } from 'react';
 
-const colorChannelMixer = (colorChannelA: number, colorChannelB: number, amountToMix: number) => {
-  let channelA = colorChannelA * amountToMix;
-  let channelB = colorChannelB * (1 - amountToMix);
-  return channelA + channelB;
+// carga do inventário / peso: verde até 60%, amarelo até 85%, vermelho acima disso
+const LOAD_COLORS = {
+  low: '#4ade80',
+  mid: '#eab308',
+  high: '#ef4444',
 };
 
-const colorMixer = (rgbA: number[], rgbB: number[], amountToMix: number) => {
-  let r = colorChannelMixer(rgbA[0], rgbB[0], amountToMix);
-  let g = colorChannelMixer(rgbA[1], rgbB[1], amountToMix);
-  let b = colorChannelMixer(rgbA[2], rgbB[2], amountToMix);
-  return `rgb(${r}, ${g}, ${b})`;
+// durabilidade do item: a lógica é invertida (percentual baixo = item gasto = vermelho)
+const DURABILITY_COLORS = {
+  high: '#4ade80', // > 60% de vida — saudável
+  mid: '#eab308', // 25–60% — alerta
+  low: '#ef4444', // < 25% — crítico
 };
 
-const COLORS = {
-  // Colors used - https://materialui.co/flatuicolors
-  primaryColor: [231, 76, 60], // Red (Pomegranate)
-  secondColor: [39, 174, 96], // Green (Nephritis)
-  accentColor: [211, 84, 0], // Orange (Oragne)
+export const getLoadColor = (percent: number) => {
+  if (percent >= 85) return LOAD_COLORS.high;
+  if (percent >= 60) return LOAD_COLORS.mid;
+  return LOAD_COLORS.low;
+};
+
+const getDurabilityColor = (percent: number) => {
+  if (percent <= 25) return DURABILITY_COLORS.low;
+  if (percent <= 60) return DURABILITY_COLORS.mid;
+  return DURABILITY_COLORS.high;
 };
 
 const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({ percent, durability }) => {
   const color = useMemo(
-    () =>
-      durability
-        ? percent < 50
-          ? colorMixer(COLORS.accentColor, COLORS.primaryColor, percent / 100)
-          : colorMixer(COLORS.secondColor, COLORS.accentColor, percent / 100)
-        : percent > 50
-          ? colorMixer(COLORS.primaryColor, COLORS.accentColor, percent / 100)
-          : colorMixer(COLORS.accentColor, COLORS.secondColor, percent / 50),
+    () => (durability ? getDurabilityColor(percent) : getLoadColor(percent)),
     [durability, percent]
   );
 
@@ -41,7 +40,8 @@ const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({ percen
           height: '100%',
           width: `${percent}%`,
           backgroundColor: color,
-          transition: `background ${0.3}s ease, width ${0.3}s ease`,
+          boxShadow: `0 0 6px ${color}59`,
+          transition: `background-color ${0.2}s ease, width ${0.3}s ease`,
         }}
       ></div>
     </div>

@@ -1,14 +1,26 @@
-$mainColor: #22232c;
-$textColor: #c1c2c5;
-$mainFont: Roboto;
+// ---------- design tokens (redesign preto/cinza/branco + roxo) ----------
+$mainColor: #151517; // painel / fundo dos cards (tooltip, menu de contexto, dialog)
+$textColor: #d4d4d8; // texto secundário padrão
+$mainFont: "Inter", sans-serif;
+$headerFont: "Chakra Petch", sans-serif;
+$monoFont: "JetBrains Mono", monospace;
 
+$slotColor: #1f1f23; // fundo do slot vazio/ocupado
+$slotHoverColor: #28282e;
+$lineColor: #2c2c31; // bordas sutis
 
+$purple: #a970ff;
+$purpleDeep: #6d28d9;
+$purpleGlow: rgba(169, 112, 255, 0.35);
 
+$loadLow: #4ade80; // verde — carga tranquila
+$loadMid: #eab308; // amarelo — carga alta
+$loadHigh: #ef4444; // vermelho — carga crítica
 
-$secondaryColor: rgba(12, 12, 12, 0.4);
-$secondaryColorHighlight: #33343f;
+$secondaryColor: rgba(0, 0, 0, 0.35);
+$secondaryColorHighlight: $slotHoverColor;
 $secondaryColorLight: rgba(0, 0, 0, 0.5);
-$secondaryColorDark: rgba(12, 12, 12, 0.8);
+$secondaryColorDark: rgba(0, 0, 0, 0.6);
 
 $gridCols: 5;
 $gridRows: 5;
@@ -20,9 +32,7 @@ $containerSize: calc(
 
 body {
   margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu",
-    "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  font-family: $mainFont;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
@@ -68,10 +78,8 @@ input[type="number"]::-webkit-outer-spin-button {
   background-color: $mainColor;
   color: $textColor;
   padding: 4px;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
-  border-radius: 4px;
+  border: 1px solid $lineColor;
+  border-radius: 5px;
   outline: none;
   display: flex;
   flex-direction: column;
@@ -84,24 +92,60 @@ input[type="number"]::-webkit-outer-spin-button {
   outline: none;
   border: none;
   color: $textColor;
+  font-family: $mainFont;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  transition: background-color 120ms ease, color 120ms ease;
   &:active {
     transform: none;
   }
   &:hover {
-    background-color: $secondaryColorHighlight;
+    background-color: $slotHoverColor;
+    color: #f2f2f4;
     cursor: pointer;
   }
 }
 
+.tooltip-rarity-tag {
+  font-family: $headerFont;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: -2px;
+}
+
 .tooltip-description {
-  padding-top: 5px;
+  padding-top: 2px;
 }
 
 .tooltip-markdown > p {
   margin: 0;
+}
+
+.tooltip-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  border-top: 1px solid $lineColor;
+  padding-top: 7px;
+  margin-top: 8px;
+}
+
+.tooltip-stat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: $monoFont;
+  font-size: 10.5px;
+  color: $textColor;
+
+  b {
+    color: #f2f2f4;
+    font-weight: 600;
+    text-align: right;
+  }
 }
 
 button:active {
@@ -157,39 +201,43 @@ body.inv-dragging {
   .inventory-control-input {
     transition: 200ms;
     padding: 16px 8px;
-    border-radius: 2.5%;
-    font-family: $mainFont;
+    border-radius: 6px;
+    font-family: $monoFont;
     font-size: 16px;
     text-align: center;
     outline: none;
-    border: none;
-    color: #fff;
-    background-color: $secondaryColor;
+    border: 1px solid $lineColor;
+    color: #f2f2f4;
+    background-color: $slotColor;
     &:focus-within {
+      border-color: $purple;
       background-color: $secondaryColorDark;
     }
   }
 
   .inventory-control-button {
-    font-size: 14px;
-    color: #fff;
-    background-color: $secondaryColor;
-    transition: 200ms;
+    font-size: 12.5px;
+    color: #f2f2f4;
+    background-color: $slotColor;
+    border: 1px solid $lineColor;
+    transition: 150ms;
     padding: 12px 8px;
-    border-radius: 2.5%;
-    border: none;
+    border-radius: 6px;
     text-transform: uppercase;
-    font-family: $mainFont;
+    letter-spacing: 0.06em;
+    font-family: $headerFont;
+    font-weight: 600;
     width: 100%;
-    font-weight: 500;
     &:hover {
-      background-color: $secondaryColorDark;
+      background-color: $purpleDeep;
+      border-color: $purpleDeep;
     }
   }
 }
 
 .useful-controls-dialog {
   background-color: $mainColor;
+  border: 1px solid $lineColor;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -199,12 +247,12 @@ body.inv-dragging {
   display: flex;
   flex-direction: column;
   padding: 16px;
-  border-radius: 4px;
+  border-radius: 6px;
   gap: 16px;
 }
 
 .useful-controls-dialog-overlay {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(4, 4, 5, 0.65);
 }
 
 .useful-controls-dialog-title {
@@ -212,7 +260,10 @@ body.inv-dragging {
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  font-size: 18px;
+  font-family: $headerFont;
+  font-weight: 600;
+  font-size: 16px;
+  color: #f2f2f4;
 }
 
 .useful-controls-dialog-close {
@@ -225,7 +276,7 @@ body.inv-dragging {
   border-radius: 4px;
   fill: $textColor;
   &:hover {
-    background-color: $secondaryColorHighlight;
+    background-color: $slotHoverColor;
     cursor: pointer;
   }
 }
@@ -239,7 +290,7 @@ body.inv-dragging {
 .divider {
   width: 100%;
   height: 1px;
-  background-color: rgba(255, 255, 255, 0.12);
+  background-color: $lineColor;
 }
 
 .useful-controls-button {
@@ -247,7 +298,7 @@ body.inv-dragging {
   bottom: 25px;
   right: 25px;
   transition: 200ms !important;
-  border: none;
+  border: 1px solid $lineColor;
   color: white;
   width: 52px;
   height: 52px;
@@ -255,10 +306,11 @@ body.inv-dragging {
   justify-content: center;
   align-items: center;
   fill: white;
-  border-radius: 5% !important;
-  background-color: $secondaryColor !important;
+  border-radius: 8px !important;
+  background-color: $mainColor !important;
   &:hover {
-    background-color: $secondaryColorDark !important;
+    background-color: $purpleDeep !important;
+    border-color: $purpleDeep;
     cursor: pointer;
   }
 }
@@ -278,13 +330,43 @@ body.inv-dragging {
   display: flex;
   flex-direction: column;
   gap: calc($gridGap * 2);
+  background-color: $mainColor;
+  border: 1px solid $lineColor;
+  border-radius: 8px;
+  padding: 14px;
 }
 .inventory-grid-header-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.inventory-grid-label {
+  font-family: $headerFont;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #f2f2f4;
+}
+
+.inventory-grid-weight-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
   p {
-    font-size: 16px;
+    font-family: $monoFont;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    span {
+      color: $textColor;
+      font-weight: 500;
+    }
   }
 }
 
@@ -297,52 +379,104 @@ body.inv-dragging {
   overflow-y: scroll;
 }
 
+// same grid, but locked to exactly one row — used for the 5 hotbar slots at the
+// top of the player inventory, which sit outside the scrollable area
+.inventory-hotbar-row {
+  display: grid;
+  height: $gridSize + 0.22vh;
+  grid-template-columns: repeat($gridCols, $gridSize);
+  grid-auto-rows: $gridSize + 0.22vh;
+  gap: $gridGap;
+}
+
+// thin dashed line separating the first row (hotbar slots) from the rest of the
+// player's inventory — sits between two separate grids, not inside the grid itself,
+// so it doesn't inherit the tall row height of the slots around it
+.inventory-grid-divider {
+  position: relative;
+  height: 1px;
+  border-top: 1px dashed $lineColor;
+  margin: 2px 6px;
+
+  span {
+    position: absolute;
+    top: -7px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: $mainColor;
+    padding: 0 8px;
+    font-family: $monoFont;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b6b72;
+  }
+}
+
 // inventory slots
 .inventory-slot {
-  background-color: $secondaryColor;
-  background-repeat: no-repeat;
-  background-position: center;
-  border-radius: 2.5%;
+  background-color: $slotColor;
+  // two background layers can be set here: the item icon (url) and, only on
+  // items with a rarity, a radial-gradient glow — each needs its own
+  // size/position/repeat, or the single value below would apply to both and
+  // shrink the glow down to the icon's own small size instead of covering
+  // the whole slot
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, 0% 100%;
+  background-size: 7vh, 100% 100%;
+  border-radius: 6px;
   image-rendering: -webkit-optimize-contrast;
   position: relative;
-  background-size: 7vh;
   color: $textColor;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
-}
-
-.inventory-slot-label-box {
-  background-color: $mainColor;
-  color: $textColor;
-  text-align: center;
-  border-bottom-left-radius: 0.25vh;
-  border-bottom-right-radius: 0.25vh;
-  border-top-color: rgba(0, 0, 0, 0.2);
-  border-top-style: inset;
-  border-top-width: 1px;
-}
-
-.inventory-slot-label-text {
-  text-transform: uppercase;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 2px 3px;
-  font-weight: 400;
-  font-family: $mainFont;
-  font-size: 12px;
+  border: 1px solid $lineColor;
+  transition: background-color 120ms ease, border-color 120ms ease;
+  &:hover {
+    background-color: $slotHoverColor;
+    border-color: #3a3a41;
+  }
 }
 
 .inventory-slot-number {
-  background-color: white;
-  color: black;
-  height: 12px;
-  border-top-left-radius: 0.25vh;
-  border-bottom-right-radius: 0.25vh;
-  padding: 3px;
-  font-size: 12px;
-  font-family: $mainFont;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #f2f2f4;
+  opacity: 0.8;
+  font-size: 20px;
+  font-weight: 600;
+  font-family: $headerFont;
+  pointer-events: none;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+
+  // when the slot has an item, the number shrinks into a small badge on the
+  // left instead of sitting centered over the item's image
+  &.has-item {
+    top: 4px;
+    left: 4px;
+    transform: none;
+    opacity: 0.6;
+    font-size: 11px;
+    font-family: $monoFont;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 1px 4px;
+    border-radius: 4px;
+    text-shadow: none;
+  }
+}
+
+.inventory-slot-count {
+  position: absolute;
+  right: 4px;
+  bottom: 3px;
+  font-family: $monoFont;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f2f2f4;
+  background-color: rgba(0, 0, 0, 0.55);
+  padding: 1px 4px;
+  border-radius: 3px;
+  pointer-events: none;
 }
 
 .item-slot-wrapper {
@@ -359,22 +493,6 @@ body.inv-dragging {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-}
-
-.item-hotslot-header-wrapper {
-  @extend .item-slot-header-wrapper;
-  justify-content: space-between !important;
-}
-
-.item-slot-info-wrapper {
-  display: flex;
-  flex-direction: row;
-  align-self: flex-end;
-  padding: 3px;
-  gap: 3px;
-  p {
-    font-size: 12px;
-  }
 }
 
 .item-slot-currency-wrapper {
@@ -404,18 +522,19 @@ body.inv-dragging {
   pointer-events: none;
   display: flex;
   background-color: $mainColor;
-  width: 200px;
-  padding: 8px;
+  width: 220px;
+  padding: 12px 14px;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 220px;
   color: $textColor;
   font-family: $mainFont;
-  border-radius: 4px;
-  border-color: rgba(0, 0, 0, 0.2);
-  border-style: inset;
-  border-width: 1px;
+  border-radius: 6px;
+  border: 1px solid $lineColor;
+  border-left: 2px solid $purple;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  gap: 4px;
   p {
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 400;
   }
 }
@@ -425,10 +544,22 @@ body.inv-dragging {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   p {
-    font-size: 15px;
-    font-weight: 400;
+    font-family: $headerFont;
+    font-size: 14px;
+    font-weight: 600;
+    color: #f2f2f4;
   }
+}
+
+.tooltip-header-wrapper p.tooltip-type-tag {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $purple;
+  flex-shrink: 0;
 }
 
 .tooltip-crafting-duration {
@@ -520,17 +651,20 @@ body.inv-dragging {
 }
 
 .durability-bar {
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(255, 255, 255, 0.08);
   height: 3px;
+  border-radius: 2px;
   overflow: hidden;
 }
 
 .weight-bar {
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px inset rgba(0, 0, 0, 0.1);
-  height: 0.8vh;
-  border-radius: 5%;
+  background: $slotColor;
+  border: 1px solid $lineColor;
+  width: 90px;
+  height: 6px;
+  border-radius: 3px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .transition-fade-enter {
@@ -567,4 +701,236 @@ body.inv-dragging {
 .transition-slide-up-exit-active {
   transform: translateY(200px);
   transition: all 200ms;
+}
+
+// ---------- give item modal ----------
+.give-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background-color: rgba(4, 4, 5, 0.65);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.give-modal {
+  width: 280px;
+  background-color: $mainColor;
+  border: 1px solid $lineColor;
+  border-top: 2px solid $purple;
+  border-radius: 8px;
+  padding: 18px;
+  position: relative;
+}
+
+.modal-x {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background-color: $slotColor;
+  color: $textColor;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease;
+  &:hover {
+    background-color: $slotHoverColor;
+    color: #f2f2f4;
+  }
+}
+
+.give-modal-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.give-modal-icon {
+  width: 38px;
+  height: 38px;
+  background-color: $slotColor;
+  border: 1px solid $lineColor;
+  border-radius: 5px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 26px;
+  flex-shrink: 0;
+}
+
+.give-modal-name {
+  font-family: $headerFont;
+  font-size: 13px;
+  font-weight: 600;
+  color: #f2f2f4;
+}
+
+.give-modal-available {
+  font-family: $monoFont;
+  font-size: 10.5px;
+  color: $textColor;
+}
+
+.give-modal-label {
+  display: block;
+  font-family: $monoFont;
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $textColor;
+  margin-bottom: 6px;
+}
+
+.give-modal-input-row {
+  display: flex;
+  align-items: center;
+  background-color: $slotColor;
+  border: 1px solid $lineColor;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 18px;
+
+  button {
+    background: none;
+    border: none;
+    color: $textColor;
+    width: 34px;
+    height: 38px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease;
+    &:hover {
+      background-color: $slotHoverColor;
+      color: $purple;
+    }
+  }
+
+  input {
+    flex: 1;
+    text-align: center;
+    background: none;
+    border: none;
+    outline: none;
+    color: #f2f2f4;
+    font-family: $monoFont;
+    font-size: 14px;
+    -moz-appearance: textfield;
+  }
+}
+
+.give-modal-actions {
+  display: flex;
+  gap: 8px;
+
+  button {
+    flex: 1;
+    padding: 10px 0;
+    border-radius: 5px;
+    font-family: $mainFont;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid $lineColor;
+    transition: background-color 120ms ease, border-color 120ms ease;
+  }
+}
+
+.give-modal-cancel {
+  background-color: $slotColor;
+  color: $textColor;
+  &:hover {
+    background-color: $slotHoverColor;
+    color: #f2f2f4;
+  }
+}
+
+.give-modal-confirm {
+  background-color: $purpleDeep;
+  color: #f2f2f4;
+  border-color: $purpleDeep !important;
+  &:hover {
+    background-color: $purple;
+    border-color: $purple !important;
+  }
+}
+
+// ---------- weapon components modal ----------
+.components-modal {
+  width: 320px;
+}
+
+.components-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.component-slot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.component-slot {
+  width: 100%;
+  aspect-ratio: 1/1;
+  background-color: $slotColor;
+  border: 1px solid $lineColor;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: default;
+  transition: background-color 120ms ease, border-color 120ms ease, transform 100ms ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+    color: $textColor;
+  }
+
+  &.filled {
+    background-color: rgba(169, 112, 255, 0.12);
+    border-color: $purple;
+    cursor: pointer;
+
+    svg {
+      color: $purple;
+    }
+
+    &:hover {
+      border-color: $loadHigh;
+      background-color: rgba(239, 68, 68, 0.12);
+      transform: translateY(-1px);
+
+      svg {
+        color: $loadHigh;
+      }
+    }
+  }
+}
+
+.component-slot-label {
+  font-family: $mainFont;
+  font-size: 7.5px;
+  color: $textColor;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.components-hint {
+  font-family: $monoFont;
+  font-size: 9.5px;
+  color: $textColor;
+  text-align: center;
+  line-height: 1.5;
+  margin-bottom: 14px;
 }
