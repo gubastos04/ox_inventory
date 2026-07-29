@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SlotWithItem } from '../typings';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SlotWithItem } from "../typings";
 
 interface ContextMenuState {
   coords: {
@@ -15,10 +15,16 @@ const initialState: ContextMenuState = {
 };
 
 export const contextMenuSlice = createSlice({
-  name: 'contextMenu',
+  name: "contextMenu",
   initialState,
   reducers: {
-    openContextMenu(state, action: PayloadAction<{ item: SlotWithItem; coords: { x: number; y: number } }>) {
+    openContextMenu(
+      state,
+      action: PayloadAction<{
+        item: SlotWithItem;
+        coords: { x: number; y: number };
+      }>,
+    ) {
       state.coords = action.payload.coords;
       state.item = action.payload.item;
     },

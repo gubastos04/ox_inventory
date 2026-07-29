@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SlotWithItem } from '../typings';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SlotWithItem } from "../typings";
 
 interface WeaponComponentsState {
   item: SlotWithItem | null;
@@ -10,7 +10,7 @@ const initialState: WeaponComponentsState = {
 };
 
 export const weaponComponentsSlice = createSlice({
-  name: 'weaponComponents',
+  name: "weaponComponents",
   initialState,
   reducers: {
     openComponentsModal(state, action: PayloadAction<SlotWithItem>) {
@@ -22,6 +22,7 @@ export const weaponComponentsSlice = createSlice({
   },
 });
 
-export const { openComponentsModal, closeComponentsModal } = weaponComponentsSlice.actions;
+export const { openComponentsModal, closeComponentsModal } =
+  weaponComponentsSlice.actions;
 
 export default weaponComponentsSlice.reducer;

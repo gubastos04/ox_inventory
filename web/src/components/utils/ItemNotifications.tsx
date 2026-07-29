@@ -1,13 +1,13 @@
-import React, { useContext } from 'react';
-import { createPortal } from 'react-dom';
-import { TransitionGroup } from 'react-transition-group';
-import useNuiEvent from '../../hooks/useNuiEvent';
-import useQueue from '../../hooks/useQueue';
-import { Locale } from '../../store/locale';
-import { getItemUrl } from '../../helpers';
-import { SlotWithItem } from '../../typings';
-import { Items } from '../../store/items';
-import Fade from './transitions/Fade';
+import React, { useContext } from "react";
+import { createPortal } from "react-dom";
+import { TransitionGroup } from "react-transition-group";
+import useNuiEvent from "../../hooks/useNuiEvent";
+import useQueue from "../../hooks/useQueue";
+import { Locale } from "../../store/locale";
+import { getItemUrl } from "../../helpers";
+import { SlotWithItem } from "../../typings";
+import { Items } from "../../store/items";
+import Fade from "./transitions/Fade";
 
 interface ItemNotificationProps {
   item: SlotWithItem;
@@ -20,19 +20,23 @@ export const ItemNotificationsContext = React.createContext<{
 
 export const useItemNotifications = () => {
   const itemNotificationsContext = useContext(ItemNotificationsContext);
-  if (!itemNotificationsContext) throw new Error(`ItemNotificationsContext undefined`);
+  if (!itemNotificationsContext)
+    throw new Error(`ItemNotificationsContext undefined`);
   return itemNotificationsContext;
 };
 
 const ItemNotification = React.forwardRef(
-  (props: { item: ItemNotificationProps; style?: React.CSSProperties }, ref: React.ForwardedRef<HTMLDivElement>) => {
+  (
+    props: { item: ItemNotificationProps; style?: React.CSSProperties },
+    ref: React.ForwardedRef<HTMLDivElement>,
+  ) => {
     const slotItem = props.item.item;
 
     return (
       <div
         className="item-notification-item-box"
         style={{
-          backgroundImage: `url(${getItemUrl(slotItem) || 'none'}`,
+          backgroundImage: `url(${getItemUrl(slotItem) || "none"}`,
           ...props.style,
         }}
         ref={ref}
@@ -42,15 +46,21 @@ const ItemNotification = React.forwardRef(
             <p>{props.item.text}</p>
           </div>
           <div className="inventory-slot-label-box">
-            <div className="inventory-slot-label-text">{slotItem.metadata?.label || Items[slotItem.name]?.label}</div>
+            <div className="inventory-slot-label-text">
+              {slotItem.metadata?.label || Items[slotItem.name]?.label}
+            </div>
           </div>
         </div>
       </div>
     );
-  }
+  },
 );
 
-export const ItemNotificationsProvider = ({ children }: { children: React.ReactNode }) => {
+export const ItemNotificationsProvider = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
   const queue = useQueue<{
     id: number;
     item: ItemNotificationProps;
@@ -69,9 +79,15 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
     }, 2500);
   };
 
-  useNuiEvent<[item: SlotWithItem, text: string, count?: number]>('itemNotify', ([item, text, count]) => {
-    add({ item: item, text: count ? `${Locale[text]} ${count}x` : `${Locale[text]}` });
-  });
+  useNuiEvent<[item: SlotWithItem, text: string, count?: number]>(
+    "itemNotify",
+    ([item, text, count]) => {
+      add({
+        item: item,
+        text: count ? `${Locale[text]} ${count}x` : `${Locale[text]}`,
+      });
+    },
+  );
 
   return (
     <ItemNotificationsContext.Provider value={{ add }}>
@@ -80,11 +96,14 @@ export const ItemNotificationsProvider = ({ children }: { children: React.ReactN
         <TransitionGroup className="item-notification-container">
           {queue.values.map((notification, index) => (
             <Fade key={`item-notification-${index}`}>
-              <ItemNotification item={notification.item} ref={notification.ref} />
+              <ItemNotification
+                item={notification.item}
+                ref={notification.ref}
+              />
             </Fade>
           ))}
         </TransitionGroup>,
-        document.body
+        document.body,
       )}
     </ItemNotificationsContext.Provider>
   );

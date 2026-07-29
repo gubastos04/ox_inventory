@@ -1,10 +1,10 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Inventory, SlotWithItem } from '../typings';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Inventory, SlotWithItem } from "../typings";
 
 interface TooltipState {
   open: boolean;
   item: SlotWithItem | null;
-  inventoryType: Inventory['type'] | null;
+  inventoryType: Inventory["type"] | null;
 }
 
 const initialState: TooltipState = {
@@ -14,10 +14,16 @@ const initialState: TooltipState = {
 };
 
 export const tooltipSlice = createSlice({
-  name: 'tooltip',
+  name: "tooltip",
   initialState,
   reducers: {
-    openTooltip(state, action: PayloadAction<{ item: SlotWithItem; inventoryType: Inventory['type'] }>) {
+    openTooltip(
+      state,
+      action: PayloadAction<{
+        item: SlotWithItem;
+        inventoryType: Inventory["type"];
+      }>,
+    ) {
       state.open = true;
       state.item = action.payload.item;
       state.inventoryType = action.payload.inventoryType;

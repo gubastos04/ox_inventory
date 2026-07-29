@@ -9,7 +9,7 @@
  * @return returnData - A promise for the data sent back by the NuiCallbacks CB argument
  */
 
-import { isEnvBrowser } from './misc';
+import { isEnvBrowser } from "./misc";
 
 const fetch = window.fetch;
 // @ts-expect-error
@@ -17,16 +17,21 @@ window.fetch = () => {};
 // @ts-expect-error
 window.XMLHttpRequest = window.fetch;
 
-const resourceName = (window as any).GetParentResourceName ? (window as any).GetParentResourceName() : 'ox_inventory';
+const resourceName = (window as any).GetParentResourceName
+  ? (window as any).GetParentResourceName()
+  : "ox_inventory";
 
-export async function fetchNui<T>(eventName: string, data?: unknown): Promise<T> {
+export async function fetchNui<T>(
+  eventName: string,
+  data?: unknown,
+): Promise<T> {
   if (isEnvBrowser()) return undefined as any; // HACK FOR BORING ERRORS IN DEV
 
   try {
     const resp = await fetch(`https://${resourceName}/${eventName}`, {
-      method: 'post',
+      method: "post",
       headers: {
-        'Content-Type': 'application/json; charset=UTF-8',
+        "Content-Type": "application/json; charset=UTF-8",
       },
       body: JSON.stringify(data),
     });

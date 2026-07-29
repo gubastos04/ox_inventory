@@ -1,12 +1,22 @@
-import { Inventory, InventoryType, ItemData, Slot, SlotWithItem, State } from '../typings';
-import { isEqual } from 'lodash-es';
-import { store } from '../store';
-import { Items } from '../store/items';
-import { imagepath } from '../store/imagepath';
-import { fetchNui } from '../utils/fetchNui';
+import {
+  Inventory,
+  InventoryType,
+  ItemData,
+  Slot,
+  SlotWithItem,
+  State,
+} from "../typings";
+import { isEqual } from "lodash-es";
+import { store } from "../store";
+import { Items } from "../store/items";
+import { imagepath } from "../store/imagepath";
+import { fetchNui } from "../utils/fetchNui";
 
-export const canPurchaseItem = (item: Slot, inventory: { type: Inventory['type']; groups: Inventory['groups'] }) => {
-  if (inventory.type !== 'shop' || !isSlotWithItem(item)) return true;
+export const canPurchaseItem = (
+  item: Slot,
+  inventory: { type: Inventory["type"]; groups: Inventory["groups"] },
+) => {
+  if (inventory.type !== "shop" || !isSlotWithItem(item)) return true;
 
   if (item.count !== undefined && item.count === 0) return false;
 
@@ -49,7 +59,7 @@ export const canPurchaseItem = (item: Slot, inventory: { type: Inventory['type']
 };
 
 export const canCraftItem = (item: Slot, inventoryType: string) => {
-  if (!isSlotWithItem(item) || inventoryType !== 'crafting') return true;
+  if (!isSlotWithItem(item) || inventoryType !== "crafting") return true;
   if (!item.ingredients) return true;
   const leftInventory = store.getState().inventory.leftInventory;
   const ingredientItems = Object.entries(item.ingredients);
@@ -78,27 +88,44 @@ export const canCraftItem = (item: Slot, inventoryType: string) => {
   return remainingItems.length === 0;
 };
 
-export const isSlotWithItem = (slot: Slot, strict: boolean = false): slot is SlotWithItem =>
+export const isSlotWithItem = (
+  slot: Slot,
+  strict: boolean = false,
+): slot is SlotWithItem =>
   (slot.name !== undefined && slot.weight !== undefined) ||
-  (strict && slot.name !== undefined && slot.count !== undefined && slot.weight !== undefined);
+  (strict &&
+    slot.name !== undefined &&
+    slot.count !== undefined &&
+    slot.weight !== undefined);
 
 export const canStack = (sourceSlot: Slot, targetSlot: Slot) =>
-  sourceSlot.name === targetSlot.name && isEqual(sourceSlot.metadata, targetSlot.metadata);
+  sourceSlot.name === targetSlot.name &&
+  isEqual(sourceSlot.metadata, targetSlot.metadata);
 
-export const findAvailableSlot = (item: Slot, data: ItemData, items: Slot[]) => {
+export const findAvailableSlot = (
+  item: Slot,
+  data: ItemData,
+  items: Slot[],
+) => {
   if (!data.stack) return items.find((target) => target.name === undefined);
 
-  const stackableSlot = items.find((target) => target.name === item.name && isEqual(target.metadata, item.metadata));
+  const stackableSlot = items.find(
+    (target) =>
+      target.name === item.name && isEqual(target.metadata, item.metadata),
+  );
 
   return stackableSlot || items.find((target) => target.name === undefined);
 };
 
 export const getTargetInventory = (
   state: State,
-  sourceType: Inventory['type'],
-  targetType?: Inventory['type']
+  sourceType: Inventory["type"],
+  targetType?: Inventory["type"],
 ): { sourceInventory: Inventory; targetInventory: Inventory } => ({
-  sourceInventory: sourceType === InventoryType.PLAYER ? state.leftInventory : state.rightInventory,
+  sourceInventory:
+    sourceType === InventoryType.PLAYER
+      ? state.leftInventory
+      : state.rightInventory,
   targetInventory: targetType
     ? targetType === InventoryType.PLAYER
       ? state.leftInventory
@@ -116,20 +143,26 @@ export const itemDurability = (metadata: any, curTime: number) => {
   let durability = metadata.durability;
 
   if (durability > 100 && metadata.degrade)
-    durability = ((metadata.durability - curTime) / (60 * metadata.degrade)) * 100;
+    durability =
+      ((metadata.durability - curTime) / (60 * metadata.degrade)) * 100;
 
   if (durability < 0) durability = 0;
 
   return durability;
 };
 
-export const getTotalWeight = (items: Inventory['items']) =>
-  items.reduce((totalWeight, slot) => (isSlotWithItem(slot) ? totalWeight + slot.weight : totalWeight), 0);
+export const getTotalWeight = (items: Inventory["items"]) =>
+  items.reduce(
+    (totalWeight, slot) =>
+      isSlotWithItem(slot) ? totalWeight + slot.weight : totalWeight,
+    0,
+  );
 
-export const isContainer = (inventory: Inventory) => inventory.type === InventoryType.CONTAINER;
+export const isContainer = (inventory: Inventory) =>
+  inventory.type === InventoryType.CONTAINER;
 
 export const getItemData = async (itemName: string) => {
-  const resp: ItemData | null = await fetchNui('getItemData', itemName);
+  const resp: ItemData | null = await fetchNui("getItemData", itemName);
 
   if (resp?.name) {
     Items[itemName] = resp;
@@ -138,7 +171,7 @@ export const getItemData = async (itemName: string) => {
 };
 
 export const getItemUrl = (item: string | SlotWithItem) => {
-  const isObj = typeof item === 'object';
+  const isObj = typeof item === "object";
 
   if (isObj) {
     if (!item.name) return;

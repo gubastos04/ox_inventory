@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Inventory, InventoryType } from '../../typings';
-import WeightBar, { getLoadColor } from '../utils/WeightBar';
-import InventorySlot from './InventorySlot';
-import { getTotalWeight } from '../../helpers';
-import { useAppSelector } from '../../store';
-import { useIntersection } from '../../hooks/useIntersection';
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Inventory, InventoryType } from "../../typings";
+import WeightBar, { getLoadColor } from "../utils/WeightBar";
+import InventorySlot from "./InventorySlot";
+import { getTotalWeight } from "../../helpers";
+import { useAppSelector } from "../../store";
+import { useIntersection } from "../../hooks/useIntersection";
 
 const PAGE_SIZE = 30;
 
@@ -16,12 +16,16 @@ const MAX_VISIBLE_ROWS = 5;
 const ROW_HEIGHT_VH = 10.42; // $gridSize (10.2vh) + 0.22vh
 const ROW_GAP_PX = 2; // $gridGap
 
-const getContainerHeight = (rows: number) => `calc(${rows * ROW_HEIGHT_VH}vh + ${rows * ROW_GAP_PX}px)`;
+const getContainerHeight = (rows: number) =>
+  `calc(${rows * ROW_HEIGHT_VH}vh + ${rows * ROW_GAP_PX}px)`;
 
 const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const weight = useMemo(
-    () => (inventory.maxWeight !== undefined ? Math.floor(getTotalWeight(inventory.items) * 1000) / 1000 : 0),
-    [inventory.maxWeight, inventory.items]
+    () =>
+      inventory.maxWeight !== undefined
+        ? Math.floor(getTotalWeight(inventory.items) * 1000) / 1000
+        : 0,
+    [inventory.maxWeight, inventory.items],
   );
   const [page, setPage] = useState(0);
   const containerRef = useRef(null);
@@ -46,15 +50,25 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   // slots server-side), so the container can size itself off the real slot count
   // instead of a hardcoded row number — this is what lets it shrink when an
   // inventory is configured with fewer slots
-  const restSlotCount = isPlayerInventory ? Math.max(0, inventory.items.length - 5) : inventory.items.length;
-  const rows = Math.min(MAX_VISIBLE_ROWS, Math.max(1, Math.ceil(restSlotCount / GRID_COLS)));
+  const restSlotCount = isPlayerInventory
+    ? Math.max(0, inventory.items.length - 5)
+    : inventory.items.length;
+  const rows = Math.min(
+    MAX_VISIBLE_ROWS,
+    Math.max(1, Math.ceil(restSlotCount / GRID_COLS)),
+  );
 
-  const percent = inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0;
+  const percent = inventory.maxWeight
+    ? (weight / inventory.maxWeight) * 100
+    : 0;
   const weightColor = getLoadColor(percent);
 
   return (
     <>
-      <div className="inventory-grid-wrapper" style={{ pointerEvents: isBusy ? 'none' : 'auto' }}>
+      <div
+        className="inventory-grid-wrapper"
+        style={{ pointerEvents: isBusy ? "none" : "auto" }}
+      >
         <div className="inventory-grid-header-wrapper">
           <p className="inventory-grid-label">{inventory.label}</p>
           {inventory.maxWeight && (
@@ -86,7 +100,11 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
           </>
         )}
 
-        <div className="inventory-grid-container" ref={containerRef} style={{ height: getContainerHeight(rows) }}>
+        <div
+          className="inventory-grid-container"
+          ref={containerRef}
+          style={{ height: getContainerHeight(rows) }}
+        >
           <>
             {restItems.map((item, index) => (
               <InventorySlot

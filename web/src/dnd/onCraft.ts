@@ -1,8 +1,8 @@
-import { store } from '../store';
-import { DragSource, DropTarget } from '../typings';
-import { isSlotWithItem } from '../helpers';
-import { Items } from '../store/items';
-import { craftItem } from '../thunks/craftItem';
+import { store } from "../store";
+import { DragSource, DropTarget } from "../typings";
+import { isSlotWithItem } from "../helpers";
+import { Items } from "../store/items";
+import { craftItem } from "../thunks/craftItem";
 
 export const onCraft = (source: DragSource, target: DropTarget) => {
   const { inventory: state } = store.getState();
@@ -12,13 +12,15 @@ export const onCraft = (source: DragSource, target: DropTarget) => {
 
   const sourceSlot = sourceInventory.items[source.item.slot - 1];
 
-  if (!isSlotWithItem(sourceSlot)) throw new Error(`Item ${sourceSlot.slot} name === undefined`);
+  if (!isSlotWithItem(sourceSlot))
+    throw new Error(`Item ${sourceSlot.slot} name === undefined`);
 
   if (sourceSlot.count === 0) return;
 
   const sourceData = Items[sourceSlot.name];
 
-  if (sourceData === undefined) return console.error(`Item ${sourceSlot.name} data undefined!`);
+  if (sourceData === undefined)
+    return console.error(`Item ${sourceSlot.name} data undefined!`);
 
   const targetSlot = targetInventory.items[target.item.slot - 1];
 
@@ -39,6 +41,6 @@ export const onCraft = (source: DragSource, target: DropTarget) => {
       ...data,
       fromSlot: sourceSlot.slot,
       toSlot: targetSlot.slot,
-    })
+    }),
   );
 };

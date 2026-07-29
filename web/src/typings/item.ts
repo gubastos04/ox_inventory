@@ -14,6 +14,19 @@ export type ItemData = {
   type?: ComponentType;
 };
 
-export type Rarity = 'comum' | 'incomum' | 'raro' | 'epico' | 'lendario' | 'mitico';
+export type Rarity =
+  | "comum"
+  | "incomum"
+  | "raro"
+  | "epico"
+  | "lendario"
+  | "mitico";
 
-export type ComponentType = 'flashlight' | 'muzzle' | 'barrel' | 'grip' | 'magazine' | 'sight' | 'skin';
+export type ComponentType =
+  | "flashlight"
+  | "muzzle"
+  | "barrel"
+  | "grip"
+  | "magazine"
+  | "sight"
+  | "skin";

@@ -1,6 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef } from 'react';
-import { useDragLayer, useDragDropManager } from 'react-dnd';
-import { DragSource } from '../../typings';
+import React, { useEffect, useLayoutEffect, useRef } from "react";
+import { useDragLayer, useDragDropManager } from "react-dnd";
+import { DragSource } from "../../typings";
 
 const DragPreview: React.FC = () => {
   const manager = useDragDropManager();
@@ -14,8 +14,8 @@ const DragPreview: React.FC = () => {
   }));
 
   useEffect(() => {
-    document.body.classList.toggle('inv-dragging', isDragging);
-    return () => document.body.classList.remove('inv-dragging');
+    document.body.classList.toggle("inv-dragging", isDragging);
+    return () => document.body.classList.remove("inv-dragging");
   }, [isDragging]);
 
   // Write the position straight to the node so the preview tracks the cursor 1:1
@@ -36,7 +36,13 @@ const DragPreview: React.FC = () => {
 
   if (!isDragging || !data?.item) return null;
 
-  return <div className="item-drag-preview" ref={rootRef} style={{ backgroundImage: data.image }} />;
+  return (
+    <div
+      className="item-drag-preview"
+      ref={rootRef}
+      style={{ backgroundImage: data.image }}
+    />
+  );
 };
 
 export default DragPreview;

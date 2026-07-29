@@ -1,5 +1,5 @@
-import { Inventory } from './inventory';
-import { Slot } from './slot';
+import { Inventory } from "./inventory";
+import { Slot } from "./slot";
 
 export type State = {
   leftInventory: Inventory;

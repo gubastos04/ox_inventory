@@ -1,14 +1,20 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { fetchNui } from '../utils/fetchNui';
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { fetchNui } from "../utils/fetchNui";
 
 export const craftItem = createAsyncThunk(
-  'inventory/craftItem',
+  "inventory/craftItem",
   async (
-    data: { fromSlot: number; fromType: string; toSlot: number; toType: string; count: number },
-    { rejectWithValue }
+    data: {
+      fromSlot: number;
+      fromType: string;
+      toSlot: number;
+      toType: string;
+      count: number;
+    },
+    { rejectWithValue },
   ) => {
     try {
-      const response = await fetchNui<boolean>('craftItem', data);
+      const response = await fetchNui<boolean>("craftItem", data);
 
       if (response === false) {
         return rejectWithValue(response);
@@ -16,5 +22,5 @@ export const craftItem = createAsyncThunk(
     } catch (error) {
       return rejectWithValue(false);
     }
-  }
+  },
 );

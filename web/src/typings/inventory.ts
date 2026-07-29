@@ -1,10 +1,10 @@
-import { Slot } from './slot';
+import { Slot } from "./slot";
 
 export enum InventoryType {
-  PLAYER = 'player',
-  SHOP = 'shop',
-  CONTAINER = 'container',
-  CRAFTING = 'crafting',
+  PLAYER = "player",
+  SHOP = "shop",
+  CONTAINER = "container",
+  CRAFTING = "crafting",
 }
 
 export type Inventory = {

@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react';
+import React, { useMemo } from "react";
 
 // carga do inventário / peso: verde até 60%, amarelo até 85%, vermelho acima disso
 const LOAD_COLORS = {
-  low: '#4ade80',
-  mid: '#eab308',
-  high: '#ef4444',
+  low: "#4ade80",
+  mid: "#eab308",
+  high: "#ef4444",
 };
 
 // durabilidade do item: a lógica é invertida (percentual baixo = item gasto = vermelho)
 const DURABILITY_COLORS = {
-  high: '#4ade80', // > 60% de vida — saudável
-  mid: '#eab308', // 25–60% — alerta
-  low: '#ef4444', // < 25% — crítico
+  high: "#4ade80", // > 60% de vida — saudável
+  mid: "#eab308", // 25–60% — alerta
+  low: "#ef4444", // < 25% — crítico
 };
 
 export const getLoadColor = (percent: number) => {
@@ -26,18 +26,21 @@ const getDurabilityColor = (percent: number) => {
   return DURABILITY_COLORS.high;
 };
 
-const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({ percent, durability }) => {
+const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({
+  percent,
+  durability,
+}) => {
   const color = useMemo(
     () => (durability ? getDurabilityColor(percent) : getLoadColor(percent)),
-    [durability, percent]
+    [durability, percent],
   );
 
   return (
-    <div className={durability ? 'durability-bar' : 'weight-bar'}>
+    <div className={durability ? "durability-bar" : "weight-bar"}>
       <div
         style={{
-          visibility: percent > 0 ? 'visible' : 'hidden',
-          height: '100%',
+          visibility: percent > 0 ? "visible" : "hidden",
+          height: "100%",
           width: `${percent}%`,
           backgroundColor: color,
           boxShadow: `0 0 6px ${color}59`,

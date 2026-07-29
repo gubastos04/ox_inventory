@@ -1,8 +1,8 @@
-import { CaseReducer, PayloadAction } from '@reduxjs/toolkit';
-import { itemDurability } from '../helpers';
-import { inventorySlice } from '../store/inventory';
-import { Items } from '../store/items';
-import { InventoryType, Slot, State } from '../typings';
+import { CaseReducer, PayloadAction } from "@reduxjs/toolkit";
+import { itemDurability } from "../helpers";
+import { inventorySlice } from "../store/inventory";
+import { Items } from "../store/items";
+import { InventoryType, Slot, State } from "../typings";
 
 export type ItemsPayload = { item: Slot; inventory?: InventoryType };
 
@@ -13,9 +13,13 @@ interface Payload {
   slotsData?: { inventoryId: string; slots: number };
 }
 
-export const refreshSlotsReducer: CaseReducer<State, PayloadAction<Payload>> = (state, action) => {
+export const refreshSlotsReducer: CaseReducer<State, PayloadAction<Payload>> = (
+  state,
+  action,
+) => {
   if (action.payload.items) {
-    if (!Array.isArray(action.payload.items)) action.payload.items = [action.payload.items];
+    if (!Array.isArray(action.payload.items))
+      action.payload.items = [action.payload.items];
     const curTime = Math.floor(Date.now() / 1000);
 
     Object.values(action.payload.items)
@@ -57,9 +61,9 @@ export const refreshSlotsReducer: CaseReducer<State, PayloadAction<Payload>> = (
     const inventoryMaxWeight = action.payload.weightData.maxWeight;
     const inv =
       inventoryId === state.leftInventory.id
-        ? 'leftInventory'
+        ? "leftInventory"
         : inventoryId === state.rightInventory.id
-          ? 'rightInventory'
+          ? "rightInventory"
           : null;
 
     if (!inv) return;
@@ -73,19 +77,19 @@ export const refreshSlotsReducer: CaseReducer<State, PayloadAction<Payload>> = (
 
     const inv =
       inventoryId === state.leftInventory.id
-        ? 'leftInventory'
+        ? "leftInventory"
         : inventoryId === state.rightInventory.id
-          ? 'rightInventory'
+          ? "rightInventory"
           : null;
 
     if (!inv) return;
 
     state[inv].slots = slots;
     inventorySlice.caseReducers.setupInventory(state, {
-      type: 'setupInventory',
+      type: "setupInventory",
       payload: {
-        leftInventory: inv === 'leftInventory' ? state[inv] : undefined,
-        rightInventory: inv === 'rightInventory' ? state[inv] : undefined,
+        leftInventory: inv === "leftInventory" ? state[inv] : undefined,
+        rightInventory: inv === "rightInventory" ? state[inv] : undefined,
       },
     });
   }

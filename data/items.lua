@@ -2,6 +2,7 @@ return {
 	['bandage'] = {
 		label = 'Bandage',
 		weight = 115,
+		rarity = 'incomum',
 		client = {
 			anim = { dict = 'missheistdockssetup1clipboard@idle_a', clip = 'idle_a', flag = 49 },
 			prop = { model = `prop_rolled_sock_02`, pos = vec3(-0.14, -0.14, -0.08), rot = vec3(-50.0, -50.0, 0.0) },
@@ -17,6 +18,7 @@ return {
 	['burger'] = {
 		label = 'Burger',
 		weight = 220,
+		rarity = 'comum',
 		client = {
 			status = { hunger = 200000 },
 			anim = 'eating',
@@ -29,6 +31,7 @@ return {
 	['sprunk'] = {
 		label = 'Sprunk',
 		weight = 350,
+		rarity = 'comum',
 		client = {
 			status = { thirst = 200000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
@@ -42,6 +45,7 @@ return {
 		label = 'Parachute',
 		weight = 8000,
 		stack = false,
+		rarity = 'epico',
 		client = {
 			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
 			usetime = 1500
@@ -57,11 +61,13 @@ return {
 		weight = 1,
 		stack = false,
 		close = false,
-		consume = 0
+		consume = 0,
+		rarity = 'incomum'
 	},
 
 	['identification'] = {
 		label = 'Identification',
+		rarity = 'comum',
 		client = {
 			image = 'card_id.png'
 		}
@@ -70,6 +76,7 @@ return {
 	['lockpick'] = {
 		label = 'Lockpick',
 		weight = 160,
+		rarity = 'lendario',
 	},
 
 	['money'] = {
@@ -79,6 +86,7 @@ return {
 	['water'] = {
 		label = 'Water',
 		weight = 500,
+		rarity = 'comum',
 		client = {
 			status = { thirst = 200000 },
 			anim = { dict = 'mp_player_intdrink', clip = 'loop_bottle' },
@@ -93,13 +101,15 @@ return {
 		label = 'Radio',
 		weight = 1000,
 		stack = false,
-		allowArmed = true
+		allowArmed = true,
+		rarity = 'raro',
 	},
 
 	['armour'] = {
 		label = 'Bulletproof Vest',
 		weight = 3000,
 		stack = false,
+		rarity = 'mitico',
 		client = {
 			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
 			usetime = 3500

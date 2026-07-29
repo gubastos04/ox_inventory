@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SlotWithItem } from '../typings';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SlotWithItem } from "../typings";
 
 interface GiveItemState {
   item: SlotWithItem | null;
@@ -10,7 +10,7 @@ const initialState: GiveItemState = {
 };
 
 export const giveItemSlice = createSlice({
-  name: 'giveItem',
+  name: "giveItem",
   initialState,
   reducers: {
     openGiveModal(state, action: PayloadAction<SlotWithItem>) {

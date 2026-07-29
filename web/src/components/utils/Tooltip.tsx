@@ -1,7 +1,14 @@
-import { flip, FloatingPortal, offset, shift, useFloating, useTransitionStyles } from '@floating-ui/react';
-import React, { useEffect } from 'react';
-import { useAppSelector } from '../../store';
-import SlotTooltip from '../inventory/SlotTooltip';
+import {
+  flip,
+  FloatingPortal,
+  offset,
+  shift,
+  useFloating,
+  useTransitionStyles,
+} from "@floating-ui/react";
+import React, { useEffect } from "react";
+import { useAppSelector } from "../../store";
+import SlotTooltip from "../inventory/SlotTooltip";
 
 const Tooltip: React.FC = () => {
   const hoverData = useAppSelector((state) => state.tooltip);
@@ -9,14 +16,17 @@ const Tooltip: React.FC = () => {
   const { refs, context, floatingStyles } = useFloating({
     middleware: [flip(), shift(), offset({ mainAxis: 10, crossAxis: 10 })],
     open: hoverData.open,
-    placement: 'right-start',
+    placement: "right-start",
   });
 
   const { isMounted, styles } = useTransitionStyles(context, {
     duration: 200,
   });
 
-  const handleMouseMove = ({ clientX, clientY }: MouseEvent | React.MouseEvent<unknown, MouseEvent>) => {
+  const handleMouseMove = ({
+    clientX,
+    clientY,
+  }: MouseEvent | React.MouseEvent<unknown, MouseEvent>) => {
     refs.setPositionReference({
       getBoundingClientRect() {
         return {
@@ -34,10 +44,10 @@ const Tooltip: React.FC = () => {
   };
 
   useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
 

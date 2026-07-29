@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { SlotWithItem } from '../typings';
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { SlotWithItem } from "../typings";
 
 interface SplitStackState {
   item: SlotWithItem | null;
@@ -10,7 +10,7 @@ const initialState: SplitStackState = {
 };
 
 export const splitStackSlice = createSlice({
-  name: 'splitStack',
+  name: "splitStack",
   initialState,
   reducers: {
     openSplitModal(state, action: PayloadAction<SlotWithItem>) {
