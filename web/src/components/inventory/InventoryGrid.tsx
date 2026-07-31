@@ -90,9 +90,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
                 />
               ))}
             </div>
-            <div className="inventory-grid-divider">
-              <span>Inventário</span>
-            </div>
           </>
         )}
 

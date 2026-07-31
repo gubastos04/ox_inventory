@@ -391,30 +391,6 @@ body.inv-dragging {
   gap: $gridGap;
 }
 
-// thin dashed line separating the first row (hotbar slots) from the rest of the
-// player's inventory — sits between two separate grids, not inside the grid itself,
-// so it doesn't inherit the tall row height of the slots around it
-.inventory-grid-divider {
-  position: relative;
-  height: 1px;
-  border-top: 1px dashed $lineColor;
-  margin: 2px 6px;
-
-  span {
-    position: absolute;
-    top: -7px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: $mainColor;
-    padding: 0 8px;
-    font-family: $monoFont;
-    font-size: 9px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: #6b6b72;
-  }
-}
-
 // inventory slots
 .inventory-slot {
   background-color: $slotColor;
