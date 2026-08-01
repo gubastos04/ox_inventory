@@ -19,7 +19,7 @@ debugData([
       leftInventory: {
         id: "test",
         type: "player",
-        slots: 50,
+        slots: 25,
         label: "Bob Smith",
         weight: 27901,
         maxWeight: 30000,
@@ -125,7 +125,7 @@ debugData([
 
           // plain items with no special fields, for the "demais itens" baseline
           { slot: 14, name: "burger", weight: 220, count: 2 },
-          { slot: 15, name: "identification", weight: 5, count: 1 },
+          { slot: 15, name: "card_id", weight: 5, count: 1 },
         ],
       },
       rightInventory: {

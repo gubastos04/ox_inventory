@@ -80,8 +80,8 @@ export const Items: {
     count: 0,
     rarity: "comum",
   },
-  identification: {
-    name: "identification",
+  card_id: {
+    name: "card_id",
     close: false,
     label: "Identification",
     stack: false,

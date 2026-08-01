@@ -182,11 +182,9 @@ body.inv-dragging {
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-evenly;
   align-items: center;
   height: 100%;
-
-  gap: 20px;
 }
 
 .inventory-control {
@@ -381,8 +379,6 @@ body.inv-dragging {
   overflow-y: scroll;
 }
 
-// same grid, but locked to exactly one row — used for the 5 hotbar slots at the
-// top of the player inventory, which sit outside the scrollable area
 .inventory-hotbar-row {
   display: grid;
   height: $gridSize + 0.22vh;
@@ -394,11 +390,6 @@ body.inv-dragging {
 // inventory slots
 .inventory-slot {
   background-color: $slotColor;
-  // two background layers can be set here: the item icon (url) and, only on
-  // items with a rarity, a radial-gradient glow — each needs its own
-  // size/position/repeat, or the single value below would apply to both and
-  // shrink the glow down to the icon's own small size instead of covering
-  // the whole slot
   background-repeat: no-repeat, no-repeat;
   background-position:
     center,
@@ -426,20 +417,17 @@ body.inv-dragging {
   left: 50%;
   transform: translate(-50%, -50%);
   color: #f2f2f4;
-  opacity: 0.8;
-  font-size: 20px;
+  opacity: 0.2;
+  font-size: 64px;
   font-weight: 600;
   font-family: $headerFont;
   pointer-events: none;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-
-  // when the slot has an item, the number shrinks into a small badge on the
-  // left instead of sitting centered over the item's image
   &.has-item {
     top: 4px;
     left: 4px;
     transform: none;
-    opacity: 0.6;
+    opacity: 0.8;
     font-size: 11px;
     font-family: $monoFont;
     background-color: rgba(0, 0, 0, 0.5);
