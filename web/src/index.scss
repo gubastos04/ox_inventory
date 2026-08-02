@@ -1,13 +1,13 @@
 // ---------- design tokens (redesign preto/cinza/branco + roxo) ----------
-$mainColor: #151517; // painel / fundo dos cards (tooltip, menu de contexto, dialog)
-$textColor: #d4d4d8; // texto secundário padrão
+$mainColor: #2e2e2e; // painel / fundo dos cards (tooltip, menu de contexto, dialog)
+$textColor: #bdbdbd; // texto secundário padrão
 $mainFont: "Inter", sans-serif;
 $headerFont: "Chakra Petch", sans-serif;
 $monoFont: "JetBrains Mono", monospace;
 
-$slotColor: #1f1f23; // fundo do slot vazio/ocupado
+$slotColor: #141416; // fundo do slot vazio/ocupado
 $slotHoverColor: #28282e;
-$lineColor: #2c2c31; // bordas sutis
+$lineColor: #ffffff46; // bordas sutis
 
 $purple: #a970ff;
 $purpleDeep: #6d28d9;
@@ -182,9 +182,10 @@ body.inv-dragging {
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  justify-content: space-between;
   align-items: center;
   height: 100%;
+  margin: 0 1.3rem;
 }
 
 .inventory-control {
@@ -329,7 +330,6 @@ body.inv-dragging {
 .inventory-grid-wrapper {
   display: flex;
   flex-direction: column;
-  gap: calc($gridGap * 2);
   background-color: $mainColor;
   border: 1px solid $lineColor;
   border-radius: 8px;
@@ -341,6 +341,7 @@ body.inv-dragging {
   justify-content: space-between;
   align-items: center;
   padding-bottom: 4px;
+  margin-bottom: calc($gridGap * 2);
 }
 
 .inventory-grid-label {
@@ -385,6 +386,7 @@ body.inv-dragging {
   grid-template-columns: repeat($gridCols, $gridSize);
   grid-auto-rows: $gridSize + 0.22vh;
   gap: $gridGap;
+  margin-bottom: $gridGap;
 }
 
 // inventory slots

@@ -12,12 +12,12 @@ const PAGE_SIZE = 30;
 // they're used to size the scrollable grid to however many rows the inventory
 // actually needs (instead of always reserving a fixed 5-row block)
 const GRID_COLS = 5;
-const MAX_VISIBLE_ROWS = 5;
+const MAX_VISIBLE_ROWS = 7;
 const ROW_HEIGHT_VH = 10.42; // $gridSize (10.2vh) + 0.22vh
 const ROW_GAP_PX = 2; // $gridGap
 
 const getContainerHeight = (rows: number) =>
-  `calc(${rows * ROW_HEIGHT_VH}vh + ${rows * ROW_GAP_PX}px)`;
+  `calc(${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px)`;
 
 const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const weight = useMemo(
@@ -49,8 +49,13 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const restSlotCount = isPlayerInventory
     ? Math.max(0, inventory.items.length - 5)
     : inventory.items.length;
+  // the player's hotbar row already spends one row's worth of the shared
+  // MAX_VISIBLE_ROWS budget, so its own grid caps one row lower — this way
+  // hotbar(1) + grid(≤4) and a plain grid(≤5) both top out at the same
+  // total height, no matter how many slots either inventory is configured with
+  const maxGridRows = MAX_VISIBLE_ROWS - (isPlayerInventory ? 1 : 0);
   const rows = Math.min(
-    MAX_VISIBLE_ROWS,
+    maxGridRows,
     Math.max(1, Math.ceil(restSlotCount / GRID_COLS)),
   );
 

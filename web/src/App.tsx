@@ -19,9 +19,9 @@ debugData([
       leftInventory: {
         id: "test",
         type: "player",
-        slots: 25,
+        slots: 35,
         label: "Bob Smith",
-        weight: 27901,
+        weight: 0,
         maxWeight: 30000,
         items: [
           // slots 1-5 land in the hotbar row — one item per rarity tier,
@@ -131,7 +131,7 @@ debugData([
       rightInventory: {
         id: "stash-test",
         type: "stash",
-        slots: 25,
+        slots: 60,
         label: "Baú de Testes",
         weight: 5476,
         maxWeight: 20000,
