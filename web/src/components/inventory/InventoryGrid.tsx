@@ -81,7 +81,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
             </div>
           )}
         </div>
-
+        <div className="inventory-grid-divider" />
         {isPlayerInventory && hotbarItems.length > 0 && (
           <>
             <div className="inventory-hotbar-row">

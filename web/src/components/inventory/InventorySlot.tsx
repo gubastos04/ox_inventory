@@ -195,7 +195,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
       ref={refs}
       onContextMenu={handleContext}
       onClick={handleClick}
-      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}`}
+      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}${isOver ? " is-drop-target" : ""}`}
       style={{
         filter:
           !canPurchaseItem(item, {
@@ -204,9 +204,8 @@ const InventorySlot: React.ForwardRefRenderFunction<
           }) || !canCraftItem(item, inventoryType)
             ? "brightness(80%) grayscale(100%)"
             : undefined,
-        opacity: isDragging ? 0.4 : 1.0,
+        opacity: isDragging ? 0.3 : 1.0,
         backgroundImage: backgroundLayers,
-        border: isOver ? "1px dashed rgba(255,255,255,0.4)" : "",
       }}
     >
       {isSlotWithItem(item) && (
@@ -257,8 +256,8 @@ const InventorySlot: React.ForwardRefRenderFunction<
                       style={{
                         color:
                           item.currency === "money" || !item.currency
-                            ? "#2ECC71"
-                            : "#E74C3C",
+                            ? "var(--color-emerald)"
+                            : "var(--color-red)",
                       }}
                     >
                       <p>

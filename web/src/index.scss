@@ -1,21 +1,98 @@
-// ---------- design tokens (redesign preto/cinza/branco + roxo) ----------
-$mainColor: #2e2e2e; // painel / fundo dos cards (tooltip, menu de contexto, dialog)
-$textColor: #bdbdbd; // texto secundário padrão
-$mainFont: "Inter", sans-serif;
-$headerFont: "Chakra Petch", sans-serif;
-$monoFont: "JetBrains Mono", monospace;
+// =========================================================================
+// DESIGN TOKENS — fundação visual (Fase 1)
+// Fonte única de verdade em CSS custom properties (:root); as variáveis SCSS
+// abaixo são apenas aliases, preservando 100% dos usos existentes no resto
+// deste arquivo sem precisar tocar em cada um agora.
+// =========================================================================
+:root {
+  // ---------- cor base ----------
+  --color-void: #0a0a0b; // preto carvão — fundo mais profundo
+  --color-graphite: #131316; // grafite — painéis, cards, modais
+  --color-graphite-soft: #17171b; // variação sutil pra cabeçalhos internos
+  --color-surface: #1c1c20; // cinza escuro — slot vazio/ocupado
+  --color-surface-hover: #232328; // hover sobre superfície
+  --color-surface-active: #28282e; // pressed/selecionado
+  --color-border: #29292f; // contorno discreto padrão
+  --color-border-strong: #35353c; // contorno em foco/hover
 
-$slotColor: #141416; // fundo do slot vazio/ocupado
-$slotHoverColor: #28282e;
-$lineColor: #ffffff46; // bordas sutis
+  --color-gray: #6b6b76; // cinza médio — texto secundário
+  --color-gray-dim: #4d4d55; // texto terciário / desabilitado
+  --color-off-white: #f2f2f0; // off white — texto primário
 
-$purple: #a970ff;
-$purpleDeep: #6d28d9;
-$purpleGlow: rgba(169, 112, 255, 0.35);
+  // ---------- cor semântica ----------
+  --color-emerald: #34d399; // ações positivas, sucesso, carga tranquila
+  --color-emerald-deep: #0f9968;
+  --color-red: #e2585a; // erro — vermelho discreto, não saturado
+  --color-red-deep: #b8393b;
+  --color-amber: #eab308; // aviso / carga em alerta
 
-$loadLow: #4ade80; // verde — carga tranquila
-$loadMid: #eab308; // amarelo — carga alta
-$loadHigh: #ef4444; // vermelho — carga crítica
+  // azul petróleo — cor de interação primária (substitui o roxo genérico;
+  // roxo passa a existir só como cor da raridade "épico")
+  --color-petrol: #2f93ab;
+  --color-petrol-deep: #1f7286;
+  --color-petrol-glow: rgba(47, 147, 171, 0.35);
+
+  // ---------- raridades ----------
+  --rarity-comum: #7a7a82;
+  --rarity-incomum: #3ddc84;
+  --rarity-raro: #3b9eff;
+  --rarity-epico: #a970ff;
+  --rarity-lendario: #f5a623;
+  --rarity-mitico: #ff3d68;
+
+  // ---------- tipografia ----------
+  --font-sans: "Inter", "SF Pro Display", "General Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  // ---------- espaçamento (ritmo de 4px) ----------
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  // ---------- raio ----------
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  // ---------- elevação (sutil, sem exagero) ----------
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
+
+  // ---------- movimento ----------
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1); // ease-out suave, sem bounce
+  --duration-fast: 150ms;
+  --duration-base: 200ms;
+  --duration-slow: 250ms;
+}
+
+// ---------- aliases SCSS (compatibilidade com o restante do arquivo) ----------
+$mainColor: var(--color-graphite);
+$textColor: var(--color-gray);
+$mainFont: var(--font-sans);
+$headerFont: var(
+  --font-sans
+); // headers agora usam Inter em peso maior, não uma fonte separada
+$monoFont: var(--font-mono);
+
+$slotColor: var(--color-surface);
+$slotHoverColor: var(--color-surface-hover);
+$lineColor: var(--color-border);
+
+$purple: var(
+  --color-petrol
+); // accent geral de interação (petróleo, não mais roxo)
+$purpleDeep: var(--color-petrol-deep);
+$purpleGlow: var(--color-petrol-glow);
+
+$loadLow: var(--color-emerald);
+$loadMid: var(--color-amber);
+$loadHigh: var(--color-red);
 
 $secondaryColor: rgba(0, 0, 0, 0.35);
 $secondaryColorHighlight: $slotHoverColor;
@@ -157,17 +234,39 @@ button:active {
 .item-drag-preview {
   width: 7.7vh;
   height: 7.7vh;
-  z-index: 1;
+  z-index: 50;
   position: fixed;
   pointer-events: none;
   top: 0;
   left: 0;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+.item-drag-preview-inner {
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-surface);
   background-repeat: no-repeat;
   background-position: center;
   background-size: 7vh;
+  border: 1px solid var(--color-petrol);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  opacity: 0.92;
   image-rendering: -webkit-optimize-contrast;
-  will-change: transform;
-  backface-visibility: hidden;
+  animation: drag-preview-in var(--duration-fast) var(--ease-premium) forwards;
+}
+
+@keyframes drag-preview-in {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 0.92;
+    transform: scale(1.05);
+  }
 }
 
 body.inv-dragging {
@@ -185,7 +284,7 @@ body.inv-dragging {
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  margin: 0 1.3rem;
+  margin: 0 3vh;
 }
 
 .inventory-control {
@@ -330,10 +429,17 @@ body.inv-dragging {
 .inventory-grid-wrapper {
   display: flex;
   flex-direction: column;
-  background-color: $mainColor;
-  border: 1px solid $lineColor;
-  border-radius: 8px;
-  padding: 14px;
+  box-sizing: border-box;
+  background-color: var(--color-graphite);
+  background-image: linear-gradient(
+    180deg,
+    var(--color-graphite-soft) 0%,
+    var(--color-graphite) 140px
+  );
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-4);
 }
 .inventory-grid-header-wrapper {
   display: flex;
@@ -391,7 +497,7 @@ body.inv-dragging {
 
 // inventory slots
 .inventory-slot {
-  background-color: $slotColor;
+  background-color: var(--color-surface);
   background-repeat: no-repeat, no-repeat;
   background-position:
     center,
@@ -399,17 +505,29 @@ body.inv-dragging {
   background-size:
     7vh,
     100% 100%;
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   image-rendering: -webkit-optimize-contrast;
   position: relative;
-  color: $textColor;
-  border: 1px solid $lineColor;
+  color: var(--color-gray);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   transition:
-    background-color 120ms ease,
-    border-color 120ms ease;
+    background-color var(--duration-fast) var(--ease-premium),
+    border-color var(--duration-fast) var(--ease-premium),
+    transform var(--duration-fast) var(--ease-premium),
+    box-shadow var(--duration-fast) var(--ease-premium),
+    opacity var(--duration-fast) var(--ease-premium);
   &:hover {
-    background-color: $slotHoverColor;
-    border-color: #3a3a41;
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  &.is-drop-target {
+    border-color: var(--color-petrol);
+    border-style: dashed;
+    background-color: rgba(47, 147, 171, 0.1);
+    box-shadow: 0 0 0 1px var(--color-petrol-glow);
   }
 }
 
@@ -418,38 +536,39 @@ body.inv-dragging {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: #f2f2f4;
-  opacity: 0.2;
-  font-size: 64px;
-  font-weight: 600;
+  color: var(--color-off-white);
+  opacity: 0.14;
+  font-size: 48px;
+  font-weight: 700;
   font-family: $headerFont;
   pointer-events: none;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
   &.has-item {
-    top: 4px;
-    left: 4px;
+    top: var(--space-1);
+    left: var(--space-1);
     transform: none;
-    opacity: 0.8;
-    font-size: 11px;
+    opacity: 0.85;
+    font-size: 10.5px;
     font-family: $monoFont;
-    background-color: rgba(0, 0, 0, 0.5);
-    padding: 1px 4px;
-    border-radius: 4px;
-    text-shadow: none;
+    font-weight: 600;
+    background-color: rgba(10, 10, 11, 0.55);
+    backdrop-filter: blur(6px);
+    padding: 2px 5px;
+    border-radius: var(--radius-sm);
   }
 }
 
 .inventory-slot-count {
   position: absolute;
-  right: 4px;
-  bottom: 3px;
+  right: var(--space-1);
+  bottom: var(--space-1);
   font-family: $monoFont;
   font-size: 11px;
   font-weight: 600;
-  color: #f2f2f4;
-  background-color: rgba(0, 0, 0, 0.55);
-  padding: 1px 4px;
-  border-radius: 3px;
+  color: var(--color-off-white);
+  background-color: rgba(10, 10, 11, 0.6);
+  backdrop-filter: blur(6px);
+  padding: 2px 5px;
+  border-radius: var(--radius-sm);
   pointer-events: none;
 }
 
@@ -461,6 +580,19 @@ body.inv-dragging {
   p {
     font-size: 12px;
   }
+}
+
+.inventory-grid-divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(216, 216, 216, 0) 0%,
+    rgba(47, 146, 171, 0.2) 35%,
+    rgba(47, 146, 171, 0.2) 85%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  margin: 8px 0;
 }
 
 .item-slot-header-wrapper {
@@ -488,6 +620,7 @@ body.inv-dragging {
   padding-right: 3px;
   p {
     font-size: 14px;
+    font-weight: 600;
     text-shadow: 0.1vh 0.1vh 0 rgba(0, 0, 0, 0.7);
   }
 }
@@ -627,18 +760,47 @@ body.inv-dragging {
 .durability-bar {
   background: rgba(255, 255, 255, 0.08);
   height: 3px;
-  border-radius: 2px;
+  border-radius: var(--radius-full);
   overflow: hidden;
 }
 
 .weight-bar {
-  background: $slotColor;
-  border: 1px solid $lineColor;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   width: 90px;
   height: 6px;
-  border-radius: 3px;
+  border-radius: var(--radius-full);
   overflow: hidden;
   flex-shrink: 0;
+}
+
+.weight-bar-fill {
+  height: 100%;
+  background-color: var(--bar-color);
+  background-image: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0) 65%
+  );
+  box-shadow: 0 0 6px 0 var(--bar-color);
+  border-radius: var(--radius-full);
+  transition:
+    width var(--duration-slow) var(--ease-premium),
+    background-color var(--duration-base) var(--ease-premium);
+
+  &.is-critical {
+    animation: weight-bar-pulse 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes weight-bar-pulse {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .transition-fade-enter {

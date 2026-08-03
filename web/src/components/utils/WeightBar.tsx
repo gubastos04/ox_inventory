@@ -2,16 +2,16 @@ import React, { useMemo } from "react";
 
 // carga do inventário / peso: verde até 60%, amarelo até 85%, vermelho acima disso
 const LOAD_COLORS = {
-  low: "#4ade80",
-  mid: "#eab308",
-  high: "#ef4444",
+  low: "var(--color-emerald)",
+  mid: "var(--color-amber)",
+  high: "var(--color-red)",
 };
 
 // durabilidade do item: a lógica é invertida (percentual baixo = item gasto = vermelho)
 const DURABILITY_COLORS = {
-  high: "#4ade80", // > 60% de vida — saudável
-  mid: "#eab308", // 25–60% — alerta
-  low: "#ef4444", // < 25% — crítico
+  high: "var(--color-emerald)", // > 60% de vida — saudável
+  mid: "var(--color-amber)", // 25–60% — alerta
+  low: "var(--color-red)", // < 25% — crítico
 };
 
 export const getLoadColor = (percent: number) => {
@@ -26,6 +26,9 @@ const getDurabilityColor = (percent: number) => {
   return DURABILITY_COLORS.high;
 };
 
+const isCritical = (percent: number, durability?: boolean) =>
+  durability ? percent <= 25 : percent >= 85;
+
 const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({
   percent,
   durability,
@@ -34,18 +37,19 @@ const WeightBar: React.FC<{ percent: number; durability?: boolean }> = ({
     () => (durability ? getDurabilityColor(percent) : getLoadColor(percent)),
     [durability, percent],
   );
+  const critical = isCritical(percent, durability);
 
   return (
     <div className={durability ? "durability-bar" : "weight-bar"}>
       <div
-        style={{
-          visibility: percent > 0 ? "visible" : "hidden",
-          height: "100%",
-          width: `${percent}%`,
-          backgroundColor: color,
-          boxShadow: `0 0 6px ${color}59`,
-          transition: `background-color ${0.2}s ease, width ${0.3}s ease`,
-        }}
+        className={`weight-bar-fill${critical ? " is-critical" : ""}`}
+        style={
+          {
+            visibility: percent > 0 ? "visible" : "hidden",
+            width: `${percent}%`,
+            "--bar-color": color,
+          } as React.CSSProperties
+        }
       ></div>
     </div>
   );

@@ -37,11 +37,12 @@ const DragPreview: React.FC = () => {
   if (!isDragging || !data?.item) return null;
 
   return (
-    <div
-      className="item-drag-preview"
-      ref={rootRef}
-      style={{ backgroundImage: data.image }}
-    />
+    <div className="item-drag-preview" ref={rootRef}>
+      <div
+        className="item-drag-preview-inner"
+        style={{ backgroundImage: data.image }}
+      />
+    </div>
   );
 };
 
