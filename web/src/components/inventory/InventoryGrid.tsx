@@ -3,8 +3,19 @@ import { Inventory, InventoryType } from "../../typings";
 import WeightBar, { getLoadColor } from "../utils/WeightBar";
 import InventorySlot from "./InventorySlot";
 import { getTotalWeight } from "../../helpers";
-import { useAppSelector } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { useIntersection } from "../../hooks/useIntersection";
+import { fetchNui } from "../../utils/fetchNui";
+import { closeTooltip } from "../../store/tooltip";
+import { closeContextMenu } from "../../store/contextMenu";
+import { closeGiveModal } from "../../store/giveItem";
+import { closeSplitModal } from "../../store/splitStack";
+import { closeComponentsModal } from "../../store/weaponComponents";
+import { Locale } from "../../store/locale";
+import UserIcon from "../utils/icons/UserIcon";
+import ScaleIcon from "../utils/icons/ScaleIcon";
+import GroundIcon from "../utils/icons/GroundIcon";
+import BoxIcon from "../utils/icons/BoxIcon";
 
 const PAGE_SIZE = 30;
 
@@ -19,7 +30,19 @@ const ROW_GAP_PX = 2; // $gridGap
 const getContainerHeight = (rows: number) =>
   `calc(${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px)`;
 
+// the ground pile (a specific dropped stack, or the generic nearby-loot
+// aggregate) shares the same icon/fallback-label treatment
+const isGroundType = (type: string) =>
+  type === InventoryType.DROP || type === "newdrop";
+
+const getHeaderIcon = (type: string) => {
+  if (type === InventoryType.PLAYER) return <UserIcon />;
+  if (isGroundType(type)) return <GroundIcon />;
+  return <BoxIcon />;
+};
+
 const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
+  const dispatch = useAppDispatch();
   const weight = useMemo(
     () =>
       inventory.maxWeight !== undefined
@@ -37,7 +60,26 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
       setPage((prev) => ++prev);
     }
   }, [entry]);
+  const isContainer = inventory.type === InventoryType.CONTAINER;
+  const canGoBack = !!inventory.canGoBack;
+
+  // Closes the container — or, if it was opened on top of something else
+  // (the ground, an outer bag, a stash...), steps back to that instead of
+  // closing the whole inventory. The server decides which one happens
+  // (see the 'backContainer' NUI callback), so we just ask and clean up
+  // anything that shouldn't carry over (tooltip, context menu, modals).
+  const closeContainer = () => {
+    dispatch(closeTooltip());
+    dispatch(closeContextMenu());
+    dispatch(closeGiveModal());
+    dispatch(closeSplitModal());
+    dispatch(closeComponentsModal());
+    fetchNui("backContainer");
+  };
+
   const isPlayerInventory = inventory.type === InventoryType.PLAYER;
+  const displayLabel =
+    inventory.label || (isGroundType(inventory.type) ? Locale.ui_ground : "");
   const visibleItems = inventory.items.slice(0, (page + 1) * PAGE_SIZE);
   const hotbarItems = isPlayerInventory ? visibleItems.slice(0, 5) : [];
   const restItems = isPlayerInventory ? visibleItems.slice(5) : visibleItems;
@@ -71,15 +113,37 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
         style={{ pointerEvents: isBusy ? "none" : "auto" }}
       >
         <div className="inventory-grid-header-wrapper">
-          <p className="inventory-grid-label">{inventory.label}</p>
-          {inventory.maxWeight && (
-            <div className="inventory-grid-weight-info">
-              <p style={{ color: weightColor }}>
-                {weight / 1000}kg <span>/ {inventory.maxWeight / 1000}kg</span>
-              </p>
-              <WeightBar percent={percent} />
-            </div>
-          )}
+          <div className="inventory-grid-title">
+            <span className="inventory-grid-icon">
+              {getHeaderIcon(inventory.type)}
+            </span>
+            <p className="inventory-grid-label">{displayLabel}</p>
+          </div>
+          <div className="inventory-grid-header-actions">
+            {inventory.maxWeight && (
+              <div className="inventory-grid-weight-info">
+                <span className="inventory-grid-icon">
+                  <ScaleIcon />
+                </span>
+                <p style={{ color: weightColor }}>
+                  {weight / 1000}kg{" "}
+                  <span>/ {inventory.maxWeight / 1000}kg</span>
+                </p>
+                <WeightBar percent={percent} />
+              </div>
+            )}
+            {isContainer && (
+              <button
+                type="button"
+                className="inventory-grid-close-button"
+                onClick={closeContainer}
+                aria-label={canGoBack ? Locale.ui_back || "Back" : "Close"}
+                title={canGoBack ? Locale.ui_back || "Back" : "Close"}
+              >
+                {canGoBack ? "‹" : "✕"}
+              </button>
+            )}
+          </div>
         </div>
         <div className="inventory-grid-divider" />
         {isPlayerInventory && hotbarItems.length > 0 && (

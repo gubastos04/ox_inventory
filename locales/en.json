@@ -11,6 +11,8 @@
   "ui_split": "Split stack",
   "ui_split_amount": "Amount to split off",
   "ui_available": "Available",
+  "ui_ground": "Ground",
+  "ui_back": "Back",
   "ui_ammo": "Ammo",
   "ui_serial": "Serial number",
   "ui_components": "Components",

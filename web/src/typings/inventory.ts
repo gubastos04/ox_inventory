@@ -5,6 +5,7 @@ export enum InventoryType {
   SHOP = "shop",
   CONTAINER = "container",
   CRAFTING = "crafting",
+  DROP = "drop",
 }
 
 export type Inventory = {
@@ -15,4 +16,5 @@ export type Inventory = {
   maxWeight?: number;
   label?: string;
   groups?: Record<string, number>;
+  canGoBack?: boolean;
 };

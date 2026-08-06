@@ -18,6 +18,9 @@ import GiveItemModal from "./GiveItemModal";
 import SplitStackModal from "./SplitStackModal";
 import WeaponComponentsModal from "./WeaponComponentsModal";
 import Fade from "../utils/transitions/Fade";
+import { closeGiveModal } from "../../store/giveItem";
+import { closeSplitModal } from "../../store/splitStack";
+import { closeComponentsModal } from "../../store/weaponComponents";
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
@@ -28,6 +31,9 @@ const Inventory: React.FC = () => {
     setInventoryVisible(false);
     dispatch(closeContextMenu());
     dispatch(closeTooltip());
+    dispatch(closeGiveModal());
+    dispatch(closeSplitModal());
+    dispatch(closeComponentsModal());
   });
   useExitListener(setInventoryVisible);
 

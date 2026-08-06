@@ -130,7 +130,7 @@ debugData([
       },
       rightInventory: {
         id: "stash-test",
-        type: "stash",
+        type: "container",
         slots: 60,
         label: "Baú de Testes",
         weight: 5476,
