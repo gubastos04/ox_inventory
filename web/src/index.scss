@@ -284,7 +284,7 @@ body.inv-dragging {
   justify-content: space-between;
   align-items: flex-start;
   height: 100%;
-  padding: 5vh 3vh;
+  padding: 3vh;
 }
 
 .inventory-control {
@@ -527,6 +527,11 @@ body.inv-dragging {
   transition:
     background-color 0.15s ease,
     color 0.15s ease;
+
+  svg {
+    width: 12px;
+    height: 12px;
+  }
 
   &:hover {
     background-color: var(--color-danger, #c0392b);
@@ -824,7 +829,7 @@ body.inv-dragging {
 .weight-bar {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  width: 50px;
+  width: 90px;
   height: 6px;
   border-radius: var(--radius-full);
   overflow: hidden;

@@ -12,10 +12,11 @@ import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
 import { Locale } from "../../store/locale";
-import UserIcon from "../utils/icons/UserIcon";
-import ScaleIcon from "../utils/icons/ScaleIcon";
-import GroundIcon from "../utils/icons/GroundIcon";
-import BoxIcon from "../utils/icons/BoxIcon";
+import UserIcon from "../utils/icons/Usericon";
+import ScaleIcon from "../utils/icons/Scaleicon";
+import GroundIcon from "../utils/icons/Groundicon";
+import BoxIcon from "../utils/icons/Boxicon";
+import ArrowIcon from "../utils/icons/Arrowicon";
 
 const PAGE_SIZE = 30;
 
@@ -140,7 +141,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
                 aria-label={canGoBack ? Locale.ui_back || "Back" : "Close"}
                 title={canGoBack ? Locale.ui_back || "Back" : "Close"}
               >
-                {canGoBack ? "‹" : "✕"}
+                {canGoBack ? <ArrowIcon /> : "✕"}
               </button>
             )}
           </div>
