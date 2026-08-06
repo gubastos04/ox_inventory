@@ -282,14 +282,9 @@ body.inv-dragging {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  // was `center`: with a container's grid (often 1-2 rows) sitting next to the
-  // player's inventory (often 6-7 rows), centering made the shorter panel look
-  // like a floating, disconnected modal instead of a sibling panel. Aligning
-  // both to the top keeps the container docked to the same header line as the
-  // left inventory, however tall or short its grid ends up being.
   align-items: flex-start;
   height: 100%;
-  margin: 0 3vh;
+  padding: 5vh 3vh;
 }
 
 .inventory-control {
@@ -829,7 +824,7 @@ body.inv-dragging {
 .weight-bar {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  width: 90px;
+  width: 50px;
   height: 6px;
   border-radius: var(--radius-full);
   overflow: hidden;
