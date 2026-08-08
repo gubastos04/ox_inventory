@@ -20,19 +20,14 @@ import ArrowIcon from "../utils/icons/Arrowicon";
 
 const PAGE_SIZE = 30;
 
-// keep these in sync with $gridCols / $gridRows / $gridSize / $gridGap in index.scss —
-// they're used to size the scrollable grid to however many rows the inventory
-// actually needs (instead of always reserving a fixed 5-row block)
-const GRID_COLS = 5;
-const MAX_VISIBLE_ROWS = 7;
-const ROW_HEIGHT_VH = 10.42; // $gridSize (10.2vh) + 0.22vh
-const ROW_GAP_PX = 2; // $gridGap
+const GRID_COLS = 7;
+const MAX_VISIBLE_ROWS = 6;
+const ROW_HEIGHT_VH = 13.22; // $gridSize (13vh) + 0.22vh
+const ROW_GAP_PX = 3; // $gridGap
 
 const getContainerHeight = (rows: number) =>
   `calc(${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px)`;
 
-// the ground pile (a specific dropped stack, or the generic nearby-loot
-// aggregate) shares the same icon/fallback-label treatment
 const isGroundType = (type: string) =>
   type === InventoryType.DROP || type === "newdrop";
 

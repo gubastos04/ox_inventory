@@ -33,12 +33,28 @@ interface SlotProps {
   inventoryType: Inventory["type"];
   inventoryGroups: Inventory["groups"];
   item: Slot;
+  // Keeps the small icon-only slot style (shop, the 3x3 workbench grid,
+  // weapon component picker, etc). Everything else — player inventory and
+  // the right-side context panel (drop/container/stash/trunk/glovebox) —
+  // gets the bigger "card" treatment (image + name + weight + rarity)
+  // unless explicitly marked compact.
+  compact?: boolean;
 }
+
+const CARD_STYLE_TYPES = new Set([
+  "player",
+  "drop",
+  "newdrop",
+  "container",
+  "stash",
+  "trunk",
+  "glovebox",
+]);
 
 const InventorySlot: React.ForwardRefRenderFunction<
   HTMLDivElement,
   SlotProps
-> = ({ item, inventoryId, inventoryType, inventoryGroups }, ref) => {
+> = ({ item, inventoryId, inventoryType, inventoryGroups, compact }, ref) => {
   const manager = useDragDropManager();
   const dispatch = useAppDispatch();
   const timerRef = useRef<number | null>(null);
@@ -180,6 +196,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
   const refs = useMergeRefs([connectRef, ref]);
 
   const rarity = isSlotWithItem(item) ? Items[item.name]?.rarity : undefined;
+  const showCard = !compact && CARD_STYLE_TYPES.has(inventoryType);
 
   const backgroundLayers = [
     `url(${item?.name ? getItemUrl(item as SlotWithItem) : "none"})`,
@@ -195,7 +212,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
       ref={refs}
       onContextMenu={handleContext}
       onClick={handleClick}
-      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}${isOver ? " is-drop-target" : ""}`}
+      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}${isOver ? " is-drop-target" : ""}${showCard ? " inventory-slot-card" : ""}`}
       style={{
         filter:
           !canPurchaseItem(item, {
@@ -271,9 +288,24 @@ const InventorySlot: React.ForwardRefRenderFunction<
             </div>
           )}
 
-          {item.count > 0 && (
+          {item.count > 1 && (
             <div className="inventory-slot-count">
               {item.count.toLocaleString("en-us")}
+            </div>
+          )}
+
+          {showCard && (
+            <div className="inventory-slot-card-footer">
+              <span className="inventory-slot-card-name">
+                {Items[item.name]?.label || item.name}
+              </span>
+              {item.weight > 0 && (
+                <span className="inventory-slot-card-weight">
+                  {item.weight >= 1000
+                    ? `${(item.weight / 1000).toLocaleString("en-us", { minimumFractionDigits: 1 })}KG`
+                    : `${item.weight.toLocaleString("en-us")}G`}
+                </span>
+              )}
             </div>
           )}
         </div>

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import useNuiEvent from "../../hooks/useNuiEvent";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import {
   refreshSlots,
+  selectRightInventory,
   setAdditionalMetadata,
   setupInventory,
 } from "../../store/inventory";
@@ -21,14 +22,19 @@ import Fade from "../utils/transitions/Fade";
 import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
+import InventoryHeader, { InventoryTab } from "./InventoryHeader";
+import WorkbenchGrid from "./WorkbenchGrid";
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState<InventoryTab>("inventory");
   const dispatch = useAppDispatch();
+  const rightInventory = useAppSelector(selectRightInventory);
 
   useNuiEvent<boolean>("setInventoryVisible", setInventoryVisible);
   useNuiEvent<false>("closeInventory", () => {
     setInventoryVisible(false);
+    setActiveTab("inventory");
     dispatch(closeContextMenu());
     dispatch(closeTooltip());
     dispatch(closeGiveModal());
@@ -57,14 +63,36 @@ const Inventory: React.FC = () => {
   return (
     <>
       <Fade in={inventoryVisible}>
-        <div className="inventory-wrapper">
-          <LeftInventory />
-          <RightInventory />
-          <Tooltip />
-          <InventoryContext />
-          <GiveItemModal />
-          <SplitStackModal />
-          <WeaponComponentsModal />
+        <div className="inventory-page">
+          <InventoryHeader activeTab={activeTab} onChangeTab={setActiveTab} />
+
+          <div className="inventory-wrapper">
+            {activeTab === "inventory" && (
+              <>
+                <LeftInventory />
+                <RightInventory />
+              </>
+            )}
+
+            {activeTab === "crafting" && (
+              <>
+                <LeftInventory />
+                {rightInventory.isWorkbench ? (
+                  <WorkbenchGrid inventory={rightInventory} />
+                ) : (
+                  <div className="crafting-empty-placeholder">
+                    <p>Aproxime-se de uma bancada de crafting.</p>
+                  </div>
+                )}
+              </>
+            )}
+
+            <Tooltip />
+            <InventoryContext />
+            <GiveItemModal />
+            <SplitStackModal />
+            <WeaponComponentsModal />
+          </div>
         </div>
       </Fade>
     </>

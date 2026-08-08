@@ -5,70 +5,77 @@
 // deste arquivo sem precisar tocar em cada um agora.
 // =========================================================================
 :root {
-  // ---------- cor base ----------
-  --color-void: #0a0a0b; // preto carvão — fundo mais profundo
-  --color-graphite: #131316; // grafite — painéis, cards, modais
-  --color-graphite-soft: #17171b; // variação sutil pra cabeçalhos internos
-  --color-surface: #1c1c20; // cinza escuro — slot vazio/ocupado
-  --color-surface-hover: #232328; // hover sobre superfície
+  // ---------- cor base (paleta "Search RP") ----------
+  --color-void: #0f1012; // background
+  --color-graphite: #151619; // surface — painéis, cards, modais
+  --color-graphite-soft: #1a1b1f; // variação sutil pra cabeçalhos internos
+  --color-surface: #1c1d21; // cinza escuro — slot vazio/ocupado
+  --color-surface-hover: #232428; // hover sobre superfície
   --color-surface-active: #28282e; // pressed/selecionado
-  --color-border: #29292f; // contorno discreto padrão
-  --color-border-strong: #35353c; // contorno em foco/hover
+  --color-border: #2a2c30; // border
+  --color-border-strong: #3d4047; // border hover
 
-  --color-gray: #6b6b76; // cinza médio — texto secundário
-  --color-gray-dim: #4d4d55; // texto terciário / desabilitado
-  --color-off-white: #f2f2f0; // off white — texto primário
+  --color-gray: #b2b2b2; // secondary — texto secundário
+  --color-gray-dim: #6b6b76; // texto terciário / desabilitado
+  --color-off-white: #f5f5f3; // white — texto primário
+
+  // ---------- accent ----------
+  --color-accent-primary: #f8edad; // dourado pálido — ações, destaque, foco
+  --color-accent-primary-glow: rgba(248, 237, 173, 0.35);
+  --color-accent-secondary: #700143; // vinho — usado com moderação (selecionado/destaque forte)
 
   // ---------- cor semântica ----------
-  --color-emerald: #34d399; // ações positivas, sucesso, carga tranquila
-  --color-emerald-deep: #0f9968;
-  --color-red: #e2585a; // erro — vermelho discreto, não saturado
-  --color-red-deep: #b8393b;
-  --color-amber: #eab308; // aviso / carga em alerta
+  --color-emerald: #58c76f; // success
+  --color-emerald-deep: #3a9b52;
+  --color-red: #c1272d; // danger
+  --color-red-deep: #971e23;
+  --color-amber: #d9b55a; // warning
 
-  // azul petróleo — cor de interação primária (substitui o roxo genérico;
-  // roxo passa a existir só como cor da raridade "épico")
-  --color-petrol: #2f93ab;
-  --color-petrol-deep: #1f7286;
-  --color-petrol-glow: rgba(47, 147, 171, 0.35);
+  // accent de interação primária = accent primary do design system acima
+  --color-petrol: var(--color-accent-primary);
+  --color-petrol-deep: #d8c98a;
+  --color-petrol-glow: var(--color-accent-primary-glow);
 
   // ---------- raridades ----------
-  --rarity-comum: #7a7a82;
-  --rarity-incomum: #3ddc84;
-  --rarity-raro: #3b9eff;
-  --rarity-epico: #a970ff;
-  --rarity-lendario: #f5a623;
-  --rarity-mitico: #ff3d68;
+  --rarity-comum: #c6c6c6;
+  --rarity-incomum: #59d36d;
+  --rarity-raro: #4fa7ff;
+  --rarity-epico: #9b5dff;
+  --rarity-lendario: #ffb547;
+  --rarity-mitico: #ff315e;
 
   // ---------- tipografia ----------
   --font-sans: "Inter", "SF Pro Display", "General Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+  --font-headline: "Bebas Neue", "Oswald", "Inter", sans-serif;
 
-  // ---------- espaçamento (ritmo de 4px) ----------
+  // ---------- espaçamento (base 8px) ----------
   --space-1: 4px;
   --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
+  --space-3: 12px; // gap
+  --space-4: 16px; // card padding
+  --space-5: 24px; // padding
   --space-6: 32px;
   --space-7: 48px;
 
   // ---------- raio ----------
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
   --radius-full: 999px;
 
-  // ---------- elevação (sutil, sem exagero) ----------
+  // ---------- elevação (muito suave — nunca glow) ----------
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
-  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.32);
+  --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
 
   // ---------- movimento ----------
   --ease-premium: cubic-bezier(0.16, 1, 0.3, 1); // ease-out suave, sem bounce
-  --duration-fast: 150ms;
+  --duration-fast: 150ms; // fade
+  --duration-hover: 100ms; // hover
   --duration-base: 200ms;
   --duration-slow: 250ms;
+  --scale-hover: 1.02;
 }
 
 // ---------- aliases SCSS (compatibilidade com o restante do arquivo) ----------
@@ -76,8 +83,8 @@ $mainColor: var(--color-graphite);
 $textColor: var(--color-gray);
 $mainFont: var(--font-sans);
 $headerFont: var(
-  --font-sans
-); // headers agora usam Inter em peso maior, não uma fonte separada
+  --font-headline
+); // headlines: Bebas Neue/Oswald, tracking largo
 $monoFont: var(--font-mono);
 
 $slotColor: var(--color-surface);
@@ -99,10 +106,10 @@ $secondaryColorHighlight: $slotHoverColor;
 $secondaryColorLight: rgba(0, 0, 0, 0.5);
 $secondaryColorDark: rgba(0, 0, 0, 0.6);
 
-$gridCols: 5;
-$gridRows: 5;
-$gridSize: 10.2vh;
-$gridGap: 2px;
+$gridCols: 7;
+$gridRows: 6;
+$gridSize: 13vh;
+$gridGap: 3px;
 $containerSize: calc(
   #{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap}
 );
@@ -278,13 +285,115 @@ body.inv-dragging {
   }
 }
 
+.inventory-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  inset: 0;
+  // Fase 1 pedia um "menu screen" opaco (como o mockup de referência), não
+  // um HUD semi-transparente por cima do jogo — o body/html continuam
+  // `background: none` (ver acima) pra não afetar nada fora do inventário.
+  background-color: var(--color-void);
+}
+
+.inventory-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  flex-shrink: 0;
+  padding: 0 3vh;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.inventory-header-logo {
+  font-family: $headerFont;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--color-off-white);
+  text-transform: uppercase;
+  padding-left: 14px;
+  border-left: 2px solid var(--color-accent-secondary);
+  margin: 0;
+}
+
+.inventory-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.inventory-header-tab {
+  background: none;
+  border: none;
+  padding: 4px 0;
+  font-family: $mainFont;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: $textColor;
+  cursor: pointer;
+  position: relative;
+  transition: color var(--duration-hover) var(--ease-premium);
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 1px;
+    background-color: var(--color-accent-primary);
+    transform: scaleX(0);
+    transition: transform var(--duration-fast) var(--ease-premium);
+  }
+
+  &:hover {
+    color: var(--color-off-white);
+  }
+
+  &.active {
+    color: var(--color-accent-primary);
+
+    &::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+.inventory-header-clock {
+  font-family: $monoFont;
+  font-size: 13px;
+  color: $textColor;
+  margin: 0;
+}
+
+.crafting-empty-placeholder{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: $textColor;
+  font-size: 13px;
+  text-align: center;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  min-height: 200px;
+}
+
+
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   align-items: flex-start;
-  height: 100%;
-  padding: 3vh;
+  flex: 1;
+  min-height: 0;
+  margin: 2vh 3vh;
 }
 
 .inventory-control {
@@ -446,8 +555,8 @@ body.inv-dragging {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 4px;
-  margin-bottom: calc($gridGap * 2);
+  padding-bottom: 2px;
+  margin-bottom: calc($gridGap * 0.6rem);
 }
 
 .inventory-grid-title {
@@ -557,6 +666,153 @@ body.inv-dragging {
   margin-bottom: $gridGap;
 }
 
+// 3x3 "Minecraft-style" crafting workbench (see WorkbenchGrid.tsx)
+.workbench-wrapper {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.workbench-grid-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.workbench-grid-and-output {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.workbench-grid {
+  display: grid;
+  grid-template-columns: repeat(3, $gridSize);
+  grid-auto-rows: $gridSize + 0.22vh;
+  gap: $gridGap;
+}
+
+.workbench-output-arrow {
+  color: $textColor;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.workbench-output-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: $gridSize;
+  height: $gridSize + 0.22vh;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 4px);
+  cursor: not-allowed;
+  padding: 0;
+
+  img {
+    max-width: 65%;
+    max-height: 65%;
+    filter: grayscale(1) brightness(0.6);
+  }
+
+  .workbench-output-placeholder {
+    color: $textColor;
+    font-size: 22px;
+    font-weight: 700;
+  }
+
+  .workbench-output-count {
+    font-family: $monoFont;
+    font-size: 11px;
+    font-weight: 600;
+    color: $textColor;
+    margin-top: 2px;
+  }
+
+  &.has-match {
+    cursor: pointer;
+    border-color: var(--color-success, #2e9e5b);
+    box-shadow: 0 0 0 1px var(--color-success, #2e9e5b);
+
+    img {
+      filter: none;
+    }
+
+    .workbench-output-count {
+      color: #f2f2f4;
+    }
+
+    &:hover {
+      background-color: var(--color-success, #2e9e5b);
+    }
+  }
+
+  &:disabled {
+    pointer-events: none;
+  }
+}
+
+.workbench-recipes-panel {
+  display: flex;
+  flex-direction: column;
+  width: 220px;
+  max-height: calc($gridSize * 3 + $gridGap * 2 + 10.42vh);
+}
+
+.workbench-recipes-title {
+  font-family: $headerFont;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: $textColor;
+  margin-bottom: 8px;
+}
+
+.workbench-recipes-empty {
+  font-size: 12px;
+  color: $textColor;
+  line-height: 1.4;
+}
+
+.workbench-recipes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.workbench-recipe-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm, 4px);
+  background-color: var(--color-surface);
+  border: 1px solid transparent;
+
+  img {
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+  }
+
+  span {
+    font-size: 12px;
+    color: #f2f2f4;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &.active {
+    border-color: var(--color-success, #2e9e5b);
+  }
+}
+
 // inventory slots
 .inventory-slot {
   background-color: var(--color-surface);
@@ -632,6 +888,59 @@ body.inv-dragging {
   padding: 2px 5px;
   border-radius: var(--radius-sm);
   pointer-events: none;
+  z-index: 1;
+}
+
+.inventory-slot-card {
+  background-size:
+    62%,
+    100% 100%;
+  background-position:
+    center 32%,
+    0% 100%;
+}
+
+.inventory-slot-card-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 6px var(--space-2) var(--space-2);
+  background: linear-gradient(
+    to top,
+    rgba(10, 10, 11, 0.92) 0%,
+    rgba(10, 10, 11, 0.75) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.inventory-slot-card-rarity {
+  font-family: $mainFont;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.inventory-slot-card-name {
+  font-family: $mainFont;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-off-white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inventory-slot-card-weight {
+  font-family: $monoFont;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: $textColor;
 }
 
 .item-slot-wrapper {
@@ -699,8 +1008,7 @@ body.inv-dragging {
   font-family: $mainFont;
   border-radius: 6px;
   border: 1px solid $lineColor;
-  border-left: 2px solid $purple;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-md);
   gap: 4px;
   p {
     font-size: 11.5px;
@@ -718,6 +1026,7 @@ body.inv-dragging {
     font-family: $headerFont;
     font-size: 14px;
     font-weight: 600;
+    letter-spacing: 0.08em;
     color: #f2f2f4;
   }
 }

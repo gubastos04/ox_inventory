@@ -12,6 +12,63 @@ import { fetchNui } from "./utils/fetchNui";
 import { useDragDropManager } from "react-dnd";
 import KeyPress from "./components/utils/KeyPress";
 
+const DEBUG_WORKBENCH = false;
+
+const workbenchRightInventory = {
+  id: "workbench:debug",
+  type: "stash",
+  slots: 9,
+  label: "Bancada de Craft",
+  weight: 700,
+  maxWeight: 900000,
+  isWorkbench: true,
+  recipes: [
+    {
+      name: "ak47_frame",
+      label: "AK-47 Frame",
+      grid: [
+        "iron",
+        "steel",
+        "iron",
+        "steel",
+        "wood",
+        "steel",
+        "iron",
+        "steel",
+        "iron",
+      ],
+      result: { name: "weapon_ak47", count: 1 },
+    },
+    {
+      name: "bandage_kit",
+      label: "Bandage Kit",
+      grid: [
+        false,
+        "wood",
+        false,
+        "wood",
+        "steel",
+        "wood",
+        false,
+        "wood",
+        false,
+      ],
+      result: { name: "bandage", count: [2, 4] },
+    },
+  ],
+  items: [
+    { slot: 1, name: "iron", weight: 100, count: 1 },
+    { slot: 2, name: "steel", weight: 150, count: 1 },
+    { slot: 3, name: "iron", weight: 100, count: 1 },
+    { slot: 4, name: "steel", weight: 150, count: 1 },
+    { slot: 5, name: "wood", weight: 200, count: 1 },
+    { slot: 6, name: "steel", weight: 150, count: 1 },
+    { slot: 7, name: "iron", weight: 100, count: 1 },
+    { slot: 8, name: "steel", weight: 150, count: 1 },
+    { slot: 9, name: "iron", weight: 100, count: 1 },
+  ],
+};
+
 debugData([
   {
     action: "setupInventory",
@@ -19,14 +76,14 @@ debugData([
       leftInventory: {
         id: "test",
         type: "player",
-        slots: 35,
+        slots: 30,
         label: "Bob Smith",
         weight: 0,
         maxWeight: 30000,
         items: [
           // slots 1-5 land in the hotbar row — one item per rarity tier,
           // lowest to highest, so the rarity glow is easy to compare at a glance
-          { slot: 1, name: "water", weight: 500, count: 3 },
+          { slot: 1, name: "water", weight: 2500, count: 5 },
           { slot: 2, name: "bandage", weight: 115, count: 5 },
           { slot: 3, name: "radio", weight: 1000, count: 1 },
           { slot: 4, name: "parachute", weight: 8000, count: 1 },
@@ -126,46 +183,55 @@ debugData([
           // plain items with no special fields, for the "demais itens" baseline
           { slot: 14, name: "burger", weight: 220, count: 2 },
           { slot: 15, name: "card_id", weight: 5, count: 1 },
+
+          // extra workbench materials/blueprint, for dragging into the 3x3
+          // grid when DEBUG_WORKBENCH is on
+          { slot: 16, name: "iron", weight: 100, count: 10 },
+          { slot: 17, name: "steel", weight: 150, count: 10 },
+          { slot: 18, name: "wood", weight: 200, count: 10 },
+          { slot: 19, name: "blueprint_ak47", weight: 10, count: 1 },
         ],
       },
-      rightInventory: {
-        id: "stash-test",
-        type: "stash",
-        slots: 60,
-        label: "Baú de Testes",
-        weight: 5476,
-        maxWeight: 20000,
-        items: [
-          {
-            slot: 1,
-            name: "armour",
-            weight: 3000,
-            count: 1,
-            metadata: { durability: 45 },
+      rightInventory: DEBUG_WORKBENCH
+        ? workbenchRightInventory
+        : {
+            id: "stash-test",
+            type: "stash",
+            slots: 60,
+            label: "Baú de Testes",
+            weight: 5476,
+            maxWeight: 20000,
+            items: [
+              {
+                slot: 1,
+                name: "armour",
+                weight: 3000,
+                count: 1,
+                metadata: { durability: 45 },
+              },
+              { slot: 2, name: "bandage", weight: 115, count: 3 },
+              {
+                slot: 3,
+                name: "weapon_smg",
+                weight: 2200,
+                count: 1,
+                metadata: {
+                  durability: 45,
+                  serial: "SM-11029-Q",
+                  ammo: 30,
+                  components: ["at_flashlight", "at_grip"],
+                },
+              },
+              {
+                slot: 4,
+                name: "paperbag",
+                weight: 1,
+                count: 1,
+                metadata: { container: "debug-bag-02" },
+              },
+              { slot: 5, name: "lockpick", weight: 160, count: 1 },
+            ],
           },
-          { slot: 2, name: "bandage", weight: 115, count: 3 },
-          {
-            slot: 3,
-            name: "weapon_smg",
-            weight: 2200,
-            count: 1,
-            metadata: {
-              durability: 45,
-              serial: "SM-11029-Q",
-              ammo: 30,
-              components: ["at_flashlight", "at_grip"],
-            },
-          },
-          {
-            slot: 4,
-            name: "paperbag",
-            weight: 1,
-            count: 1,
-            metadata: { container: "debug-bag-02" },
-          },
-          { slot: 5, name: "lockpick", weight: 160, count: 1 },
-        ],
-      },
     },
   },
 ]);

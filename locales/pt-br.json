@@ -13,6 +13,8 @@
   "ui_available": "Disponível",
   "ui_ground": "Chão",
   "ui_back": "Voltar",
+  "ui_known_recipes": "Receitas conhecidas",
+  "ui_no_recipes": "Use um blueprint para desbloquear receitas.",
   "ui_ammo": "Munição",
   "ui_serial": "Número de Série",
   "ui_remove_ammo": "Remover munição",

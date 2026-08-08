@@ -115,4 +115,27 @@ return {
 			usetime = 3500
 		}
 	},
+
+	-- Workbench crafting materials (examples — adjust weights/rarity/labels
+	-- as needed, or replace with your own item names in data/workbench_recipes.lua)
+	['iron'] = { label = 'Iron', weight = 100, rarity = 'comum' },
+	['steel'] = { label = 'Steel', weight = 150, rarity = 'incomum' },
+	['wood'] = { label = 'Wood', weight = 200, rarity = 'comum' },
+
+	-- Blueprints: using one of these grants the recipes listed for it in
+	-- data/workbench_blueprints.lua. See modules/workbench/server.lua.
+	['blueprint_ak47'] = {
+		label = 'Blueprint: AK-47 Frame',
+		weight = 10,
+		stack = false,
+		close = true,
+		rarity = 'raro',
+	},
+	['blueprint_weapons_pack'] = {
+		label = 'Blueprint: Weapons Pack',
+		weight = 10,
+		stack = false,
+		close = true,
+		rarity = 'mitico',
+	},
 }
