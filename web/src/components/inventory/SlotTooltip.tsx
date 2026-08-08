@@ -38,7 +38,16 @@ const SlotTooltip: React.ForwardRefRenderFunction<
           <Divider />
         </div>
       ) : (
-        <div style={style} className="tooltip-wrapper" ref={ref}>
+        <div
+          style={{
+            ...style,
+            borderLeftColor: itemData.rarity
+              ? RARITY_COLORS[itemData.rarity]
+              : undefined,
+          }}
+          className="tooltip-wrapper"
+          ref={ref}
+        >
           <div className="tooltip-header-wrapper">
             <p>{item.metadata?.label || itemData.label || item.name}</p>
             {inventoryType === "crafting" ? (

@@ -241,7 +241,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
             }
           }}
         >
-          {inventoryType === "player" && item.slot <= 5 && (
+          {inventoryType === "player" && item.slot <= 7 && (
             <div className="inventory-slot-number has-item">{item.slot}</div>
           )}
 
@@ -312,7 +312,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
       )}
       {!isSlotWithItem(item) &&
         inventoryType === "player" &&
-        item.slot <= 5 && (
+        item.slot <= 7 && (
           <div className="inventory-slot-number">{item.slot}</div>
         )}
     </div>

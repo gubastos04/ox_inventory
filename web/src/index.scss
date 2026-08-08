@@ -109,7 +109,7 @@ $secondaryColorDark: rgba(0, 0, 0, 0.6);
 $gridCols: 7;
 $gridRows: 6;
 $gridSize: 13vh;
-$gridGap: 3px;
+$gridGap: 1px;
 $containerSize: calc(
   #{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap}
 );
@@ -372,7 +372,7 @@ body.inv-dragging {
   margin: 0;
 }
 
-.crafting-empty-placeholder{
+.crafting-empty-placeholder {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -385,7 +385,6 @@ body.inv-dragging {
   min-height: 200px;
 }
 
-
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
@@ -393,7 +392,7 @@ body.inv-dragging {
   align-items: flex-start;
   flex: 1;
   min-height: 0;
-  margin: 2vh 3vh;
+  margin: 1vh 3vh;
 }
 
 .inventory-control {
@@ -547,8 +546,13 @@ body.inv-dragging {
   );
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
+  // the grid's height is computed from a fixed row count (see
+  // InventoryGrid.tsx) and can be a hair off from the actual rendered grid
+  // due to subpixel rounding — clip it so that difference never shows past
+  // the card's rounded corners instead of visibly bleeding out the bottom
+  overflow: hidden;
   box-shadow: var(--shadow-lg);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-4) var(--space-1) var(--space-4);
 }
 .inventory-grid-header-wrapper {
   display: flex;
@@ -650,7 +654,6 @@ body.inv-dragging {
 
 .inventory-grid-container {
   display: grid;
-  height: $containerSize;
   grid-template-columns: repeat($gridCols, $gridSize);
   grid-auto-rows: $gridSize + 0.22vh;
   gap: $gridGap;
@@ -823,7 +826,7 @@ body.inv-dragging {
   background-size:
     7vh,
     100% 100%;
-  border-radius: var(--radius-md);
+  border-radius: 0;
   image-rendering: -webkit-optimize-contrast;
   position: relative;
   color: var(--color-gray);
@@ -1008,6 +1011,7 @@ body.inv-dragging {
   font-family: $mainFont;
   border-radius: 6px;
   border: 1px solid $lineColor;
+  border-left: 2px solid $purple;
   box-shadow: var(--shadow-md);
   gap: 4px;
   p {

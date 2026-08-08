@@ -12,18 +12,20 @@ import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
 import { Locale } from "../../store/locale";
-import UserIcon from "../utils/icons/Usericon";
-import ScaleIcon from "../utils/icons/Scaleicon";
-import GroundIcon from "../utils/icons/Groundicon";
-import BoxIcon from "../utils/icons/Boxicon";
-import ArrowIcon from "../utils/icons/Arrowicon";
+import UserIcon from "../utils/icons/UserIcon";
+import ScaleIcon from "../utils/icons/ScaleIcon";
+import GroundIcon from "../utils/icons/GroundIcon";
+import BoxIcon from "../utils/icons/BoxIcon";
+import ArrowIcon from "../utils/icons/ArrowIcon";
 
 const PAGE_SIZE = 30;
 
 const GRID_COLS = 7;
-const MAX_VISIBLE_ROWS = 6;
+const HOTBAR_SIZE = 7; // matches GRID_COLS so the hotbar row is always full-width
+const PLAYER_GRID_ROWS = 5; // fixed rows below the hotbar, always this tall (scrolls beyond)
+const CONTEXT_GRID_ROWS = 6; // fixed rows for drop/container/stash/trunk/glovebox, always this tall (scrolls beyond)
 const ROW_HEIGHT_VH = 13.22; // $gridSize (13vh) + 0.22vh
-const ROW_GAP_PX = 3; // $gridGap
+const ROW_GAP_PX = 1; // $gridGap
 
 const getContainerHeight = (rows: number) =>
   `calc(${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px)`;
@@ -77,25 +79,23 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const displayLabel =
     inventory.label || (isGroundType(inventory.type) ? Locale.ui_ground : "");
   const visibleItems = inventory.items.slice(0, (page + 1) * PAGE_SIZE);
-  const hotbarItems = isPlayerInventory ? visibleItems.slice(0, 5) : [];
-  const restItems = isPlayerInventory ? visibleItems.slice(5) : visibleItems;
+  const hotbarItems = isPlayerInventory
+    ? visibleItems.slice(0, HOTBAR_SIZE)
+    : [];
+  const restItems = isPlayerInventory
+    ? visibleItems.slice(HOTBAR_SIZE)
+    : visibleItems;
 
   // total slot count always matches inventory.items.length (it's padded with empty
-  // slots server-side), so the container can size itself off the real slot count
-  // instead of a hardcoded row number — this is what lets it shrink when an
-  // inventory is configured with fewer slots
+  // slots server-side)
   const restSlotCount = isPlayerInventory
-    ? Math.max(0, inventory.items.length - 5)
+    ? Math.max(0, inventory.items.length - HOTBAR_SIZE)
     : inventory.items.length;
-  // the player's hotbar row already spends one row's worth of the shared
-  // MAX_VISIBLE_ROWS budget, so its own grid caps one row lower — this way
-  // hotbar(1) + grid(≤4) and a plain grid(≤5) both top out at the same
-  // total height, no matter how many slots either inventory is configured with
-  const maxGridRows = MAX_VISIBLE_ROWS - (isPlayerInventory ? 1 : 0);
-  const rows = Math.min(
-    maxGridRows,
-    Math.max(1, Math.ceil(restSlotCount / GRID_COLS)),
-  );
+  // Both panels always render at this fixed row count (padded with empty
+  // cells when the inventory has fewer items), not shrunk to fit content —
+  // only growing (with scroll) if there are genuinely more items than fit.
+  const minGridRows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
+  const rows = Math.max(minGridRows, Math.ceil(restSlotCount / GRID_COLS));
 
   const percent = inventory.maxWeight
     ? (weight / inventory.maxWeight) * 100
