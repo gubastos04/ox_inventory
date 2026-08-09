@@ -197,7 +197,7 @@ debugData([
         : {
             id: "stash-test",
             type: "stash",
-            slots: 60,
+            slots: 84,
             label: "Baú de Testes",
             weight: 5476,
             maxWeight: 20000,

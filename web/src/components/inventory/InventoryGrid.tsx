@@ -27,8 +27,28 @@ const CONTEXT_GRID_ROWS = 6; // fixed rows for drop/container/stash/trunk/gloveb
 const ROW_HEIGHT_VH = 13.22; // $gridSize (13vh) + 0.22vh
 const ROW_GAP_PX = 1; // $gridGap
 
-const getContainerHeight = (rows: number) =>
-  `calc(${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px)`;
+// Fixed-pixel chrome that eats into the viewport alongside the vh-based
+// grid rows: .inventory-header (64px) + this panel's own header row +
+// divider (~60px) + the .inventory-wrapper's vertical margin (2vh, folded
+// into the 98vh below). The player panel also has a hotbar row on top of
+// that. These are estimates with a little slack, not pixel-perfect — the
+// point of wrapping the result in min() below is that being a bit off just
+// means slightly-early scrolling, never actual overflow past the viewport.
+const PANEL_CHROME_PX = 64 + 60;
+const HOTBAR_ROW_PX_EQUIVALENT = `${ROW_HEIGHT_VH}vh + ${ROW_GAP_PX}px`;
+
+// Height for N rows, but never taller than what's actually left in the
+// viewport — this is what stops the card from being pushed off the bottom
+// of the screen on shorter/windowed viewports (see conversation history:
+// max-height on the wrapper alone doesn't reliably force a flex child to
+// shrink across browsers, so we compute the min() directly instead).
+const getContainerHeight = (rows: number, isPlayerInventory: boolean) => {
+  const ideal = `${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px`;
+  const chrome = isPlayerInventory
+    ? `${PANEL_CHROME_PX}px + ${HOTBAR_ROW_PX_EQUIVALENT}`
+    : `${PANEL_CHROME_PX}px`;
+  return `min(calc(${ideal}), calc(98vh - (${chrome})))`;
+};
 
 const isGroundType = (type: string) =>
   type === InventoryType.DROP || type === "newdrop";
@@ -86,16 +106,13 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     ? visibleItems.slice(HOTBAR_SIZE)
     : visibleItems;
 
-  // total slot count always matches inventory.items.length (it's padded with empty
-  // slots server-side)
-  const restSlotCount = isPlayerInventory
-    ? Math.max(0, inventory.items.length - HOTBAR_SIZE)
-    : inventory.items.length;
-  // Both panels always render at this fixed row count (padded with empty
-  // cells when the inventory has fewer items), not shrunk to fit content —
-  // only growing (with scroll) if there are genuinely more items than fit.
-  const minGridRows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
-  const rows = Math.max(minGridRows, Math.ceil(restSlotCount / GRID_COLS));
+  // Both panels always render at this fixed row count, full stop — not
+  // shrunk for inventories with fewer items, and not grown for ones with
+  // more (a 60-slot stash still shows only 6 rows and relies on the grid's
+  // own internal scrollbar for the rest, instead of the whole card growing
+  // to fit everything, which is what was pushing the panel off the bottom
+  // of the screen for bigger inventories).
+  const rows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
 
   const percent = inventory.maxWeight
     ? (weight / inventory.maxWeight) * 100
@@ -161,7 +178,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
         <div
           className="inventory-grid-container"
           ref={containerRef}
-          style={{ height: getContainerHeight(rows) }}
+          style={{ height: getContainerHeight(rows, isPlayerInventory) }}
         >
           <>
             {restItems.map((item, index) => (
