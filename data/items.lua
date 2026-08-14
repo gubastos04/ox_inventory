@@ -122,20 +122,15 @@ return {
 	['steel'] = { label = 'Steel', weight = 150, rarity = 'incomum' },
 	['wood'] = { label = 'Wood', weight = 200, rarity = 'comum' },
 
-	-- Blueprints: using one of these grants the recipes listed for it in
-	-- data/workbench_blueprints.lua. See modules/workbench/server.lua.
-	['blueprint_ak47'] = {
-		label = 'Blueprint: AK-47 Frame',
+	-- Blueprint: a single generic item — which recipe(s) it grants lives in
+	-- its metadata (set when the item is created, e.g. by a loot table),
+	-- not in a per-blueprint item definition. See modules/workbench/server.lua
+	-- for how that metadata is read, and how to generate one.
+	['blueprint'] = {
+		label = 'Blueprint',
 		weight = 10,
 		stack = false,
 		close = true,
 		rarity = 'raro',
-	},
-	['blueprint_weapons_pack'] = {
-		label = 'Blueprint: Weapons Pack',
-		weight = 10,
-		stack = false,
-		close = true,
-		rarity = 'mitico',
 	},
 }

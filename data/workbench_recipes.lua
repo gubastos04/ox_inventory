@@ -1,20 +1,21 @@
 --[[
-    Recipes for the 3x3 crafting workbench (modules/workbench).
+    Receitas para a bancada de trabalho 3x3 (modules/workbench).
 
-    `grid` has exactly 9 entries, read left-to-right then top-to-bottom
-    (same order Minecraft uses), e.g.
+    A `grid` (grade) possui exatamente 9 entradas, lidas da esquerda para a direita
+    e de cima para baixo (a mesma ordem usada no Minecraft), p. ex.:
 
         1 2 3
         4 5 6
         7 8 9
 
-    Use `false` (or simply omit down to 9 entries with `false`) for an empty
-    cell. The shape must match EXACTLY — same items, in the same positions —
-    for the recipe to be craftable. This does not support "shifted" versions
-    of the same shape (e.g. the same pattern moved one column to the right
-    counts as a different arrangement) to keep matching simple and predictable.
+    Use `false` (ou simplesmente omita itens até completar 9 entradas usando `false`)
+    para uma célula vazia. O formato deve corresponder EXATAMENTE — mesmos itens,
+    nas mesmas posições — para que a receita possa ser fabricada. Isso não oferece
+    suporte a versões "deslocadas" do mesmo formato (p. ex., o mesmo padrão movido
+    uma coluna para a direita conta como um arranjo diferente), para manter a
+    verificação de correspondência simples e previsível.
 
-    `result.count` can be a flat number or a {min, max} range.
+    `result.count` pode ser um número fixo ou um intervalo {min, max}.
 ]]
 
 return {
@@ -22,9 +23,9 @@ return {
         name = 'ak47_frame',
         label = 'AK-47 Frame',
         grid = {
-            'iron',  'steel', 'iron',
-            'steel', 'wood',  'steel',
-            'iron',  'steel', 'iron',
+            'iron', 'steel', 'iron',
+            'steel', 'wood', 'steel',
+            'iron', 'steel', 'iron',
         },
         result = { name = 'weapon_ak47', count = 1 },
     },
@@ -32,9 +33,9 @@ return {
         name = 'bandage_kit',
         label = 'Bandage Kit',
         grid = {
-            false,  'wood',  false,
+            false, 'wood', false,
             'wood', 'steel', 'wood',
-            false,  'wood',  false,
+            false, 'wood', false,
         },
         result = { name = 'bandage', count = { 2, 4 } },
     },

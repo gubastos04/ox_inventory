@@ -12,11 +12,11 @@ import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
 import { Locale } from "../../store/locale";
-import UserIcon from "../utils/icons/UserIcon";
-import ScaleIcon from "../utils/icons/ScaleIcon";
-import GroundIcon from "../utils/icons/GroundIcon";
-import BoxIcon from "../utils/icons/BoxIcon";
-import ArrowIcon from "../utils/icons/ArrowIcon";
+import UserIcon from "../utils/icons/Usericon";
+import ScaleIcon from "../utils/icons/Scaleicon";
+import GroundIcon from "../utils/icons/Groundicon";
+import BoxIcon from "../utils/icons/Boxicon";
+import ArrowIcon from "../utils/icons/Arrowicon";
 
 const PAGE_SIZE = 30;
 

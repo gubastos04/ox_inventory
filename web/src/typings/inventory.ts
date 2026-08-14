@@ -8,6 +8,17 @@ export enum InventoryType {
   DROP = "drop",
 }
 
+export type WorkbenchRecipe = {
+  name: string;
+  label: string;
+  // 9 entries, left-to-right then top-to-bottom; false/undefined = empty cell
+  grid: (string | false)[];
+  result: {
+    name: string;
+    count: number | [number, number];
+  };
+};
+
 export type Inventory = {
   id: string;
   type: string;
@@ -17,4 +28,6 @@ export type Inventory = {
   label?: string;
   groups?: Record<string, number>;
   canGoBack?: boolean;
+  isWorkbench?: boolean;
+  recipes?: WorkbenchRecipe[];
 };

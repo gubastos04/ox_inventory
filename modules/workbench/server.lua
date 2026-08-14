@@ -7,9 +7,22 @@
     without touching any core inventory code. See RegisterStash below.
 
     Recipes: data/workbench_recipes.lua (shaped, 3x3, exact position match).
-    Unlocking: data/workbench_blueprints.lua maps a blueprint item to the
-    recipe(s) it grants. Using a blueprint item fires the standard
-    'ox_inventory:usedItem' server event, which we listen for below.
+
+    Unlocking: a single generic 'blueprint' item (data/items.lua) carries
+    which recipe(s) it grants in its metadata, e.g.:
+
+        { recipes = { 'ak47_frame' } }
+
+    — not in the item definition itself, so any script (loot tables, admin
+    commands, quest rewards, ...) can hand out a blueprint for any recipe
+    without ox_inventory needing to know about it in advance. Build that
+    metadata with exports.ox_inventory:CreateBlueprintMetadata(recipeNames),
+    or just call exports.ox_inventory:GiveBlueprint(source, recipeNames) to
+    go straight to the player's inventory. See the bottom of this file for
+    both, and how to spawn one as ground loot via CustomDrop.
+
+    Using a blueprint item fires the standard 'ox_inventory:usedItem' server
+    event (which every item use fires), which we listen for below.
 
     Persistence: unlocked recipes are stored in `ox_player_recipes`
     (see sql/workbench_recipes.sql), keyed by the player's framework
@@ -25,6 +38,7 @@ local STASH_NAME = 'workbench'
 local STASH_LABEL = 'Bancada de Craft'
 local STASH_SLOTS = 9
 local STASH_MAX_WEIGHT = 900000 -- 900kg; generous so placing materials never blocks on weight
+local BLUEPRINT_ITEM = 'blueprint'
 
 exports.ox_inventory:RegisterStash(STASH_NAME, STASH_LABEL, STASH_SLOTS, STASH_MAX_WEIGHT, true)
 
@@ -34,9 +48,6 @@ local Recipes = {}
 for _, recipe in pairs(lib.load('data.workbench_recipes') or {}) do
     Recipes[recipe.name] = recipe
 end
-
----@type table<string, string[]>
-local Blueprints = lib.load('data.workbench_blueprints') or {}
 
 -- source -> { [recipeName] = true }, populated lazily and dropped on disconnect
 local PlayerRecipes = {}
@@ -57,7 +68,8 @@ local function loadPlayerRecipes(source)
     local cached = PlayerRecipes[source]
     if cached then return cached end
 
-    local rows = MySQL.query.await('SELECT `recipe` FROM `ox_player_recipes` WHERE `citizenid` = ?', { identifier }) or {}
+    local rows = MySQL.query.await('SELECT `recipe` FROM `ox_player_recipes` WHERE `citizenid` = ?', { identifier }) or
+    {}
     local unlocked = {}
 
     for i = 1, #rows do
@@ -114,9 +126,17 @@ local function unlockRecipes(source, recipeNames, sourceItem)
     })
 end
 
-AddEventHandler('ox_inventory:usedItem', function(_, itemName, _, _)
-    local recipeNames = Blueprints[itemName]
-    if not recipeNames then return end
+AddEventHandler('ox_inventory:usedItem', function(_, itemName, _, metadata)
+    if itemName ~= BLUEPRINT_ITEM then return end
+
+    local recipeNames = metadata and metadata.recipes
+
+    if not recipeNames or #recipeNames == 0 then
+        -- Malformed blueprint (created without going through the helpers
+        -- below) — nothing to unlock, and nothing to charge the player for
+        -- since the item is already consumed by this point.
+        return warn(('a blueprint item was used with no metadata.recipes (source %s)'):format(source))
+    end
 
     -- 'ox_inventory:usedItem' runs in the same invocation context as the
     -- player who triggered the item use, so `source` here is theirs.
@@ -222,4 +242,80 @@ lib.callback.register('ox_inventory:craftWorkbench', function(source, recipeName
     Inventory.AddItem(left, resultItem, count)
 
     return true
+end)
+
+--[[
+    Blueprint generation helpers — for loot tables, admin commands, quest
+    rewards, or anything else that needs to hand a player a blueprint for
+    some recipe.
+]]
+
+---@param recipeNames string|string[] one recipe name, or a list to make a "pack" blueprint that unlocks several at once
+---@return { recipes: string[], label: string }? metadata nil if none of the recipe names are valid
+local function createBlueprintMetadata(recipeNames)
+    if type(recipeNames) == 'string' then recipeNames = { recipeNames } end
+
+    local labels = {}
+
+    for i = 1, #recipeNames do
+        local recipe = Recipes[recipeNames[i]]
+
+        if not recipe then
+            warn(('createBlueprintMetadata: unknown recipe "%s"'):format(recipeNames[i]))
+        else
+            labels[#labels + 1] = recipe.label
+        end
+    end
+
+    if #labels == 0 then return end
+
+    return {
+        recipes = recipeNames,
+        label = ('Blueprint: %s'):format(table.concat(labels, ', ')),
+    }
+end
+
+exports('CreateBlueprintMetadata', createBlueprintMetadata)
+
+---Gives a blueprint directly to a player's inventory.
+---@param source number
+---@param recipeNames string|string[]
+---@return boolean success
+local function giveBlueprint(source, recipeNames)
+    local metadata = createBlueprintMetadata(recipeNames)
+    if not metadata then return false end
+
+    return Inventory.AddItem(source, BLUEPRINT_ITEM, 1, metadata) and true or false
+end
+
+exports('GiveBlueprint', giveBlueprint)
+
+--[[
+    To spawn one as loot on the ground / in a container instead of directly
+    in a player's inventory, use the metadata with whatever you're already
+    using to create that loot. With ox_inventory's own CustomDrop export:
+
+        local metadata = exports.ox_inventory:CreateBlueprintMetadata('ak47_frame')
+
+        exports.ox_inventory:CustomDrop('Blueprint', {
+            { name = 'blueprint', count = 1, metadata = metadata },
+        }, coords)
+]]
+
+-- Quick way to test without a loot table wired up yet:
+-- /giveblueprint [recipe name, from data/workbench_recipes.lua]
+-- Gate this behind an ace permission (or remove it) before going live.
+lib.addCommand('giveblueprint', {
+    help = 'Dev/test: gives yourself a blueprint for the given recipe',
+    params = {
+        { name = 'recipe', type = 'string', help = 'Recipe name from data/workbench_recipes.lua' },
+    },
+    restricted = 'group.admin',
+}, function(source, args)
+    if not giveBlueprint(source, args.recipe) then
+        TriggerClientEvent('ox_lib:notify', source, {
+            type = 'error',
+            description = ('Receita "%s" não existe.'):format(args.recipe),
+        })
+    end
 end)

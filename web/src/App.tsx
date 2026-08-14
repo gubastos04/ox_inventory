@@ -12,7 +12,7 @@ import { fetchNui } from "./utils/fetchNui";
 import { useDragDropManager } from "react-dnd";
 import KeyPress from "./components/utils/KeyPress";
 
-const DEBUG_WORKBENCH = false;
+const DEBUG_WORKBENCH = true;
 
 const workbenchRightInventory = {
   id: "workbench:debug",
@@ -189,7 +189,16 @@ debugData([
           { slot: 16, name: "iron", weight: 100, count: 10 },
           { slot: 17, name: "steel", weight: 150, count: 10 },
           { slot: 18, name: "wood", weight: 200, count: 10 },
-          { slot: 19, name: "blueprint_ak47", weight: 10, count: 1 },
+          {
+            slot: 19,
+            name: "blueprint",
+            weight: 10,
+            count: 1,
+            metadata: {
+              recipes: ["ak47_frame"],
+              label: "Blueprint: AK-47 Frame",
+            },
+          },
         ],
       },
       rightInventory: DEBUG_WORKBENCH

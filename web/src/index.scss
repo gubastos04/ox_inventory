@@ -383,6 +383,7 @@ body.inv-dragging {
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-md);
   min-height: 200px;
+  margin-left: 3vh;
 }
 
 .inventory-wrapper {
@@ -685,22 +686,43 @@ body.inv-dragging {
 
 // 3x3 "Minecraft-style" crafting workbench (see WorkbenchGrid.tsx)
 .workbench-wrapper {
+  // reuses .inventory-grid-wrapper's card chrome (background, border,
+  // radius, padding) — this block only adds workbench-specific layout
+  min-width: 640px;
+}
+
+.workbench-body {
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: 24px;
+  gap: var(--space-5);
+  margin-top: var(--space-2);
+}
+
+.workbench-section-label {
+  font-family: $mainFont;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $textColor;
+  margin: 0 0 8px;
+  text-align: center;
 }
 
 .workbench-grid-column {
   display: flex;
   flex-direction: column;
+
+  .workbench-section-label {
+    text-align: left;
+  }
 }
 
 .workbench-grid-and-output {
   display: flex;
   align-items: center;
-  gap: 14px;
-  margin-top: 10px;
+  gap: var(--space-4);
 }
 
 .workbench-grid {
@@ -710,10 +732,25 @@ body.inv-dragging {
   gap: $gridGap;
 }
 
+.workbench-output-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .workbench-output-arrow {
-  color: $textColor;
-  font-size: 20px;
-  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--color-accent-primary);
+  flex-shrink: 0;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 }
 
 .workbench-output-slot {
@@ -725,9 +762,10 @@ body.inv-dragging {
   height: $gridSize + 0.22vh;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 0;
   cursor: not-allowed;
   padding: 0;
+  margin-bottom: 8px;
 
   img {
     max-width: 65%;
@@ -751,19 +789,23 @@ body.inv-dragging {
 
   &.has-match {
     cursor: pointer;
-    border-color: var(--color-success, #2e9e5b);
-    box-shadow: 0 0 0 1px var(--color-success, #2e9e5b);
+    border-color: var(--color-accent-primary);
+    box-shadow: 0 0 0 1px var(--color-accent-primary);
 
     img {
       filter: none;
     }
 
     .workbench-output-count {
-      color: #f2f2f4;
+      color: var(--color-off-white);
     }
 
     &:hover {
-      background-color: var(--color-success, #2e9e5b);
+      background-color: var(--color-accent-primary);
+
+      .workbench-output-count {
+        color: var(--color-void);
+      }
     }
   }
 
@@ -772,21 +814,22 @@ body.inv-dragging {
   }
 }
 
+.workbench-vertical-divider {
+  align-self: stretch;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(216, 216, 216, 0) 0%,
+    var(--color-border-strong) 35%,
+    var(--color-border-strong) 85%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
 .workbench-recipes-panel {
   display: flex;
   flex-direction: column;
   width: 220px;
-  max-height: calc($gridSize * 3 + $gridGap * 2 + 10.42vh);
-}
-
-.workbench-recipes-title {
-  font-family: $headerFont;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: $textColor;
-  margin-bottom: 8px;
 }
 
 .workbench-recipes-empty {
@@ -799,6 +842,7 @@ body.inv-dragging {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-height: calc($gridSize * 3 + $gridGap * 2);
   overflow-y: auto;
 }
 
@@ -807,7 +851,7 @@ body.inv-dragging {
   align-items: center;
   gap: 8px;
   padding: 6px 8px;
-  border-radius: var(--radius-sm, 4px);
+  border-radius: 0;
   background-color: var(--color-surface);
   border: 1px solid transparent;
 
@@ -819,14 +863,14 @@ body.inv-dragging {
 
   span {
     font-size: 12px;
-    color: #f2f2f4;
+    color: var(--color-off-white);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   &.active {
-    border-color: var(--color-success, #2e9e5b);
+    border-color: var(--color-accent-primary);
   }
 }
 

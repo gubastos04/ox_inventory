@@ -297,7 +297,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
           {showCard && (
             <div className="inventory-slot-card-footer">
               <span className="inventory-slot-card-name">
-                {Items[item.name]?.label || item.name}
+                {item.metadata?.label || Items[item.name]?.label || item.name}
               </span>
               {item.weight > 0 && (
                 <span className="inventory-slot-card-weight">

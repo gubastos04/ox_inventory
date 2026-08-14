@@ -5,8 +5,9 @@ import WeightBar, { getLoadColor } from "../utils/WeightBar";
 import { getTotalWeight, getItemUrl } from "../../helpers";
 import { fetchNui } from "../../utils/fetchNui";
 import { Locale } from "../../store/locale";
-import BoxIcon from "../utils/icons/BoxIcon";
-import ScaleIcon from "../utils/icons/ScaleIcon";
+import BoxIcon from "../utils/icons/Boxicon";
+import ScaleIcon from "../utils/icons/Scaleicon";
+import ArrowIcon from "../utils/icons/Arrowicon";
 
 const GRID_SLOTS = 9;
 
@@ -24,7 +25,9 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     () => getTotalWeight(inventory.items),
     [inventory.items],
   );
-  const percent = inventory.maxWeight ? (weight / inventory.maxWeight) * 100 : 0;
+  const percent = inventory.maxWeight
+    ? (weight / inventory.maxWeight) * 100
+    : 0;
   const weightColor = getLoadColor(percent);
 
   // The 9 grid slots are always the first 9 items of this stash (it's
@@ -50,95 +53,110 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     if (!matchedRecipe || isCrafting) return;
     setIsCrafting(true);
     try {
-      await fetchNui<{ success: boolean }>("craftWorkbench", matchedRecipe.name);
+      await fetchNui<{ success: boolean }>(
+        "craftWorkbench",
+        matchedRecipe.name,
+      );
     } finally {
       setIsCrafting(false);
     }
   };
 
   return (
-    <div className="workbench-wrapper">
-      <div className="workbench-grid-column">
-        <div className="inventory-grid-header-wrapper">
-          <div className="inventory-grid-title">
+    <div className="inventory-grid-wrapper workbench-wrapper">
+      <div className="inventory-grid-header-wrapper">
+        <div className="inventory-grid-title">
+          <span className="inventory-grid-icon">
+            <BoxIcon />
+          </span>
+          <p className="inventory-grid-label">{inventory.label}</p>
+        </div>
+        {inventory.maxWeight && (
+          <div className="inventory-grid-weight-info">
             <span className="inventory-grid-icon">
-              <BoxIcon />
+              <ScaleIcon />
             </span>
-            <p className="inventory-grid-label">{inventory.label}</p>
+            <p style={{ color: weightColor }}>
+              {weight / 1000}kg <span>/ {inventory.maxWeight / 1000}kg</span>
+            </p>
+            <WeightBar percent={percent} />
           </div>
-          {inventory.maxWeight && (
-            <div className="inventory-grid-weight-info">
-              <span className="inventory-grid-icon">
-                <ScaleIcon />
-              </span>
-              <p style={{ color: weightColor }}>
-                {weight / 1000}kg{" "}
-                <span>/ {inventory.maxWeight / 1000}kg</span>
-              </p>
-              <WeightBar percent={percent} />
+        )}
+      </div>
+      <div className="inventory-grid-divider" />
+
+      <div className="workbench-body">
+        <div className="workbench-grid-column">
+          <div className="workbench-grid-and-output">
+            <div className="workbench-grid">
+              {gridSlots.map((item) => (
+                <InventorySlot
+                  key={`workbench-${inventory.id}-${item.slot}`}
+                  item={item}
+                  inventoryId={inventory.id}
+                  inventoryType={inventory.type}
+                  inventoryGroups={inventory.groups}
+                  compact
+                />
+              ))}
             </div>
-          )}
+
+            <span className="workbench-output-arrow">
+              <ArrowIcon />
+            </span>
+
+            <div className="workbench-output-column">
+              <button
+                type="button"
+                className={`workbench-output-slot${matchedRecipe ? " has-match" : ""}`}
+                onClick={craft}
+                disabled={!matchedRecipe || isCrafting}
+                title={matchedRecipe?.label}
+              >
+                {matchedRecipe ? (
+                  <>
+                    <img src={getItemUrl(matchedRecipe.result.name)} alt="" />
+                    <span className="workbench-output-count">
+                      {formatCount(matchedRecipe.result.count)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="workbench-output-placeholder">?</span>
+                )}
+              </button>
+              <p className="workbench-section-label">
+                {Locale.ui_result || "Resultado"}
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="workbench-grid-and-output">
-          <div className="workbench-grid">
-            {gridSlots.map((item, index) => (
-              <InventorySlot
-                key={`workbench-${inventory.id}-${item.slot}`}
-                item={item}
-                inventoryId={inventory.id}
-                inventoryType={inventory.type}
-                inventoryGroups={inventory.groups}
-              />
+        <div className="workbench-vertical-divider" />
+
+        <div className="workbench-recipes-panel">
+          <p className="workbench-section-label">
+            {Locale.ui_known_recipes || "Receitas Conhecidas"}
+          </p>
+          <div className="workbench-recipes-list">
+            {recipes.length === 0 && (
+              <p className="workbench-recipes-empty">
+                {Locale.ui_no_recipes ||
+                  "Use um blueprint para desbloquear receitas."}
+              </p>
+            )}
+            {recipes.map((recipe) => (
+              <div
+                key={recipe.name}
+                className={`workbench-recipe-entry${
+                  matchedRecipe?.name === recipe.name ? " active" : ""
+                }`}
+                title={recipe.label}
+              >
+                <img src={getItemUrl(recipe.result.name)} alt="" />
+                <span>{recipe.label}</span>
+              </div>
             ))}
           </div>
-
-          <div className="workbench-output-arrow">→</div>
-
-          <button
-            type="button"
-            className={`workbench-output-slot${matchedRecipe ? " has-match" : ""}`}
-            onClick={craft}
-            disabled={!matchedRecipe || isCrafting}
-            title={matchedRecipe?.label}
-          >
-            {matchedRecipe ? (
-              <>
-                <img src={getItemUrl(matchedRecipe.result.name)} alt="" />
-                <span className="workbench-output-count">
-                  {formatCount(matchedRecipe.result.count)}
-                </span>
-              </>
-            ) : (
-              <span className="workbench-output-placeholder">?</span>
-            )}
-          </button>
-        </div>
-      </div>
-
-      <div className="workbench-recipes-panel">
-        <p className="workbench-recipes-title">
-          {Locale.ui_known_recipes || "Receitas conhecidas"}
-        </p>
-        <div className="workbench-recipes-list">
-          {recipes.length === 0 && (
-            <p className="workbench-recipes-empty">
-              {Locale.ui_no_recipes ||
-                "Use um blueprint para desbloquear receitas."}
-            </p>
-          )}
-          {recipes.map((recipe) => (
-            <div
-              key={recipe.name}
-              className={`workbench-recipe-entry${
-                matchedRecipe?.name === recipe.name ? " active" : ""
-              }`}
-              title={recipe.label}
-            >
-              <img src={getItemUrl(recipe.result.name)} alt="" />
-              <span>{recipe.label}</span>
-            </div>
-          ))}
         </div>
       </div>
     </div>
