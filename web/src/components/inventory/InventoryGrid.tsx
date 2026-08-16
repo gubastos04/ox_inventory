@@ -24,7 +24,7 @@ const GRID_COLS = 7;
 const HOTBAR_SIZE = 7; // matches GRID_COLS so the hotbar row is always full-width
 const PLAYER_GRID_ROWS = 5; // fixed rows below the hotbar, always this tall (scrolls beyond)
 const CONTEXT_GRID_ROWS = 6; // fixed rows for drop/container/stash/trunk/glovebox, always this tall (scrolls beyond)
-const ROW_HEIGHT_VH = 13.22; // $gridSize (13vh) + 0.22vh
+const ROW_HEIGHT_VH = 11.92; // $gridSize (11.62vh) + 0.22vh
 const ROW_GAP_PX = 1; // $gridGap
 
 // Fixed-pixel chrome that eats into the viewport alongside the vh-based

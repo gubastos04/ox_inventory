@@ -12,7 +12,7 @@ import { fetchNui } from "./utils/fetchNui";
 import { useDragDropManager } from "react-dnd";
 import KeyPress from "./components/utils/KeyPress";
 
-const DEBUG_WORKBENCH = true;
+const DEBUG_WORKBENCH = false;
 
 const workbenchRightInventory = {
   id: "workbench:debug",
