@@ -108,7 +108,7 @@ $secondaryColorDark: rgba(0, 0, 0, 0.6);
 
 $gridCols: 7;
 $gridRows: 6;
-$gridSize: 11.62vh;
+$gridSize: 11.68vh;
 $gridGap: 1px;
 $containerSize: calc(
   #{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap}
@@ -378,10 +378,8 @@ body.inv-dragging {
   font-size: 13px;
   text-align: center;
   border: 1px dashed var(--color-border);
-  display: flex;
   border-radius: var(--radius-md);
   min-height: 200px;
-  margin-left: 3vh;
 }
 
 .inventory-wrapper {
