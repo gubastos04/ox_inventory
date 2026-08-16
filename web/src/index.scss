@@ -381,7 +381,6 @@ body.inv-dragging {
   display: flex;
   border-radius: var(--radius-md);
   min-height: 200px;
-  margin-left: 3vh;
 }
 
 .inventory-wrapper {
@@ -531,9 +530,6 @@ body.inv-dragging {
   color: grey !important;
 }
 
-// Dialog is used fro useful controls window
-
-// inventory grids
 .inventory-grid-wrapper {
   display: flex;
   flex-direction: column;
@@ -546,14 +542,6 @@ body.inv-dragging {
   );
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  // the grid's height is computed from a fixed row count (see
-  // InventoryGrid.tsx), which is a target for generous viewports — but a
-  // hard vh-based height plus the header's fixed pixel height can add up to
-  // more than 100vh on short/windowed viewports (like a dev browser tab
-  // that isn't fullscreen), pushing the whole card below the visible area.
-  // Capping max-height here, combined with the grid container being an
-  // actual flex/shrinkable item below, means it shrinks to fit instead —
-  // any rows that don't fit are reachable via the grid's own scrollbar.
   max-height: calc(98vh - 70px);
   overflow: hidden;
   box-shadow: var(--shadow-lg);
@@ -664,11 +652,6 @@ body.inv-dragging {
   grid-auto-rows: $gridSize + 0.22vh;
   gap: $gridGap;
   overflow-y: scroll;
-  // lets it shrink below its computed inline height (see
-  // InventoryGrid.tsx/getContainerHeight) when the wrapper's max-height
-  // cap kicks in on short viewports, instead of forcing the wrapper taller
-  // than the screen — anything that doesn't fit stays reachable by
-  // scrolling this element itself.
   flex: 1 1 auto;
   min-height: 0;
 }
@@ -685,8 +668,6 @@ body.inv-dragging {
 
 // 3x3 "Minecraft-style" crafting workbench (see WorkbenchGrid.tsx)
 .workbench-wrapper {
-  // reuses .inventory-grid-wrapper's card chrome (background, border,
-  // radius, padding) — this block only adds workbench-specific layout
   min-width: 640px;
 }
 

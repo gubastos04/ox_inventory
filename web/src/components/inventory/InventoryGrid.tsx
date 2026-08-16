@@ -105,13 +105,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const restItems = isPlayerInventory
     ? visibleItems.slice(HOTBAR_SIZE)
     : visibleItems;
-
-  // Both panels always render at this fixed row count, full stop — not
-  // shrunk for inventories with fewer items, and not grown for ones with
-  // more (a 60-slot stash still shows only 6 rows and relies on the grid's
-  // own internal scrollbar for the rest, instead of the whole card growing
-  // to fit everything, which is what was pushing the panel off the bottom
-  // of the screen for bigger inventories).
   const rows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
 
   const percent = inventory.maxWeight
