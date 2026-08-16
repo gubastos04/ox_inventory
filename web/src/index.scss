@@ -377,16 +377,8 @@ body.inv-dragging {
   color: $textColor;
   font-size: 13px;
   text-align: center;
-  border: 1px dashed var(--color-border);    display: flex;
-    flex-direction: row;
-
-    justify-content: center; /* centraliza os dois juntos */
-    align-items: flex-start; /* alinha os dois pelo topo */
-
-    flex: 1;
-    min-height: 0;
-    margin: 5vh 3vh;
-    gap: 4vh; /* espaço entre inventário e crafting */
+  border: 1px dashed var(--color-border);
+  display: flex;
   border-radius: var(--radius-md);
   min-height: 200px;
   margin-left: 3vh;
