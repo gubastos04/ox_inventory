@@ -69,7 +69,7 @@ local function loadPlayerRecipes(source)
     if cached then return cached end
 
     local rows = MySQL.query.await('SELECT `recipe` FROM `ox_player_recipes` WHERE `citizenid` = ?', { identifier }) or
-    {}
+        {}
     local unlocked = {}
 
     for i = 1, #rows do
@@ -85,7 +85,15 @@ end
 ---@param sourceItem string?
 local function unlockRecipes(source, recipeNames, sourceItem)
     local identifier = getIdentifier(source)
-    if not identifier then return end
+
+    if not identifier then
+        -- Antes: retornava em silêncio. Se inventory.owner vier nulo (bridge
+        -- de framework não configurado certo, ou testando sem personagem
+        -- carregado), o item era consumido mas nada era desbloqueado nem
+        -- persistido — e não sobrava nenhum rastro pra saber o motivo.
+        return warn(('unlockRecipes: getIdentifier retornou nil para source %s — inventory.owner não está setado (framework/bridge configurado?). Nada foi salvo.')
+        :format(source))
+    end
 
     local unlocked = loadPlayerRecipes(source)
     local newlyUnlocked = {}
@@ -109,8 +117,22 @@ local function unlockRecipes(source, recipeNames, sourceItem)
     local now = os.time()
 
     for i = 1, #newlyUnlocked do
+        local recipe = newlyUnlocked[i]
+
+        -- Antes: MySQL.insert(query, params) sem callback — se o INSERT
+        -- falhasse (ex.: tabela `ox_player_recipes` não existe porque
+        -- sql/workbench_recipes.sql nunca foi rodado contra o banco), não
+        -- aparecia nada no console. O jogador via "receita desbloqueada" e
+        -- conseguia craftar na mesma sessão (o cache em memória em
+        -- PlayerRecipes já tinha sido atualizado antes deste loop), mas ao
+        -- relogar a receita sumia porque nunca foi de fato salva.
         MySQL.insert('INSERT IGNORE INTO `ox_player_recipes` (`citizenid`, `recipe`, `unlocked_at`) VALUES (?, ?, ?)',
-            { identifier, newlyUnlocked[i], now })
+            { identifier, recipe, now }, function(insertId)
+                if not insertId then
+                    warn(('unlockRecipes: falha ao persistir a receita "%s" para "%s" — confira se sql/workbench_recipes.sql foi executado no banco (tabela `ox_player_recipes` existe?) e o console do servidor no momento do INSERT.')
+                    :format(recipe, identifier))
+                end
+            end)
     end
 
     local labels = {}
@@ -126,7 +148,7 @@ local function unlockRecipes(source, recipeNames, sourceItem)
     })
 end
 
-AddEventHandler('ox_inventory:usedItem', function(_, itemName, _, metadata)
+AddEventHandler('ox_inventory:usedItem', function(invId, itemName, _, metadata)
     if itemName ~= BLUEPRINT_ITEM then return end
 
     local recipeNames = metadata and metadata.recipes
@@ -135,12 +157,16 @@ AddEventHandler('ox_inventory:usedItem', function(_, itemName, _, metadata)
         -- Malformed blueprint (created without going through the helpers
         -- below) — nothing to unlock, and nothing to charge the player for
         -- since the item is already consumed by this point.
-        return warn(('a blueprint item was used with no metadata.recipes (source %s)'):format(source))
+        return warn(('a blueprint item was used with no metadata.recipes (source %s)'):format(invId))
     end
 
-    -- 'ox_inventory:usedItem' runs in the same invocation context as the
-    -- player who triggered the item use, so `source` here is theirs.
-    unlockRecipes(source, recipeNames, itemName)
+    -- Antes: usava o global `source`, que TriggerEvent (diferente de um
+    -- RegisterNetEvent disparado direto pelo cliente) não garante estar
+    -- setado — por isso vinha nil/vazio e getIdentifier falhava em
+    -- silêncio, sem nada ser salvo. O primeiro parâmetro do evento já é o
+    -- inventory.id de quem usou o item (equivalente ao source, pra
+    -- inventário de jogador) — é isso que precisa ser usado aqui.
+    unlockRecipes(invId, recipeNames, itemName)
 end)
 
 AddEventHandler('playerDropped', function()
@@ -270,7 +296,8 @@ local function createBlueprintMetadata(recipeNames)
     if #labels == 0 then return end
 
     return {
-        recipes = recipeNames,
+        recipes = recipeNames,                    -- nomes internos, usados apenas server-side em matchRecipe/unlockRecipes
+        recipeNames = table.concat(labels, ', '), -- string legível, é isso que o displayMetadata mostra no tooltip
         label = ('Blueprint: %s'):format(table.concat(labels, ', ')),
     }
 end

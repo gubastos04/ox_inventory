@@ -1,12 +1,6 @@
-// =========================================================================
-// DESIGN TOKENS — fundação visual (Fase 1)
-// Fonte única de verdade em CSS custom properties (:root); as variáveis SCSS
-// abaixo são apenas aliases, preservando 100% dos usos existentes no resto
-// deste arquivo sem precisar tocar em cada um agora.
-// =========================================================================
 :root {
   // ---------- cor base (paleta "Search RP") ----------
-  --color-void: #0f1012f0; // background
+  --color-void: #0f1012; // background
   --color-graphite: #151619; // surface — painéis, cards, modais
   --color-graphite-soft: #1a1b1f; // variação sutil pra cabeçalhos internos
   --color-surface: #1c1d21; // cinza escuro — slot vazio/ocupado
@@ -373,12 +367,11 @@ body.inv-dragging {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex: 1;
+  min-width: 626px;
   color: $textColor;
   font-size: 13px;
   text-align: center;
   border: 1px dashed var(--color-border);
-  display: flex;
   border-radius: var(--radius-md);
   min-height: 200px;
 }
@@ -834,6 +827,7 @@ body.inv-dragging {
   border-radius: 0;
   background-color: var(--color-surface);
   border: 1px solid transparent;
+  position: relative; // ancora o preview abaixo
 
   img {
     width: 24px;
@@ -851,6 +845,56 @@ body.inv-dragging {
 
   &.active {
     border-color: var(--color-accent-primary);
+  }
+
+  &:hover .workbench-recipe-preview {
+    display: flex;
+  }
+}
+
+.workbench-recipe-preview {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  position: absolute;
+  right: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 30;
+  padding: 10px;
+  background-color: var(--color-graphite);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  white-space: normal;
+}
+
+.workbench-recipe-preview-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-off-white);
+  margin: 0;
+  text-align: center;
+}
+
+.workbench-recipe-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 32px);
+  grid-auto-rows: 32px;
+  gap: 2px;
+}
+
+.workbench-recipe-preview-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+
+  img {
+    max-width: 70%;
+    max-height: 70%;
   }
 }
 
@@ -1404,7 +1448,7 @@ body.inv-dragging {
 
 .give-modal-confirm {
   background-color: $purpleDeep;
-  color: #f2f2f4;
+  color: #000000;
   border-color: $purpleDeep !important;
   &:hover {
     background-color: $purple;

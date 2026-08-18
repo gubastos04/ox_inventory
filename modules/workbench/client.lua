@@ -1,18 +1,28 @@
---[[
-    Physical crafting benches (ox_target). Add one entry per bench location
-    — walk to the spot, print GetEntityCoords(PlayerPedId()) in the F8
-    console, and paste the coords in here.
-]]
+exports.ox_inventory:displayMetadata({
+    { recipeNames = 'Receitas' },
+})
+
 local benches = {
-    vec3(0.0, 0.0, 0.0), -- TODO: replace with your real bench coords
+    vec3(-346.1, -130.45, 39.0),
 }
 
-if GetResourceState('ox_target') == 'started' then
+CreateThread(function()
+    local attempts = 0
+
+    while GetResourceState('ox_target') ~= 'started' and attempts < 100 do
+        Wait(100)
+        attempts += 1
+    end
+
+    if GetResourceState('ox_target') ~= 'started' then
+        return warn(
+            'ox_target não está rodando — as bancadas de crafting em modules/workbench/client.lua não foram registradas.')
+    end
+
     for i = 1, #benches do
-        exports.ox_target:addBoxZone({
+        exports.ox_target:addSphereZone({
             coords = benches[i],
-            size = vec3(1.2, 1.2, 1.5),
-            rotation = 0,
+            radius = 2.0,
             debug = false,
             options = {
                 {
@@ -26,9 +36,7 @@ if GetResourceState('ox_target') == 'started' then
             },
         })
     end
-else
-    warn('ox_target não está rodando — as bancadas de crafting em modules/workbench/client.lua não foram registradas.')
-end
+end)
 
 --[[
     Alternative: instead of fixed coords, target every instance of a bench

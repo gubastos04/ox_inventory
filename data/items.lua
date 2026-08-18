@@ -132,5 +132,6 @@ return {
 		stack = false,
 		close = true,
 		rarity = 'raro',
+		consume = 1,
 	},
 }

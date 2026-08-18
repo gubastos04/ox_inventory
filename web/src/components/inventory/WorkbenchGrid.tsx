@@ -5,7 +5,7 @@ import WeightBar, { getLoadColor } from "../utils/WeightBar";
 import { getTotalWeight, getItemUrl } from "../../helpers";
 import { fetchNui } from "../../utils/fetchNui";
 import { Locale } from "../../store/locale";
-import BoxIcon from "../utils/icons/Boxicon";
+import { Items } from "../../store/items";
 import ScaleIcon from "../utils/icons/Scaleicon";
 import ArrowIcon from "../utils/icons/Arrowicon";
 
@@ -65,12 +65,11 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   return (
     <div className="inventory-grid-wrapper workbench-wrapper">
       <div className="inventory-grid-header-wrapper">
-        <div className="inventory-grid-title">
-          <span className="inventory-grid-icon">
-            <BoxIcon />
-          </span>
-          <p className="inventory-grid-label">{inventory.label}</p>
-        </div>
+        {/* Sem título "Bancada de Craft" aqui de propósito: a aba "Crafting"
+            no header principal (InventoryHeader.tsx) já estabelece esse
+            contexto — repetir "craft" nos dois lugares empilhados era
+            redundante. A barra de peso continua porque é informação útil
+            de verdade (quanto da bancada — 900kg — já está ocupado). */}
         {inventory.maxWeight && (
           <div className="inventory-grid-weight-info">
             <span className="inventory-grid-icon">
@@ -150,10 +149,33 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
                 className={`workbench-recipe-entry${
                   matchedRecipe?.name === recipe.name ? " active" : ""
                 }`}
-                title={recipe.label}
               >
                 <img src={getItemUrl(recipe.result.name)} alt="" />
                 <span>{recipe.label}</span>
+
+                {/* Preview em hover: as receitas são "shaped" (posição
+                    importa, ver matchRecipe em modules/workbench/server.lua),
+                    então mostrar só a lista de ingredientes não bastava —
+                    precisa mostrar exatamente em qual das 9 células cada
+                    item vai. */}
+                <div className="workbench-recipe-preview">
+                  <p className="workbench-recipe-preview-title">
+                    {recipe.label}
+                  </p>
+                  <div className="workbench-recipe-preview-grid">
+                    {recipe.grid.map((name, i) => (
+                      <div key={i} className="workbench-recipe-preview-cell">
+                        {name && (
+                          <img
+                            src={getItemUrl(name)}
+                            alt={Items[name]?.label || name}
+                            title={Items[name]?.label || name}
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
