@@ -7,7 +7,7 @@ import {
   SlotWithItem,
 } from "../../typings";
 import { useDrag, useDragDropManager, useDrop } from "react-dnd";
-import { useAppDispatch } from "../../store";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { onDrop } from "../../dnd/onDrop";
 import { onBuy } from "../../dnd/onBuy";
 import {
@@ -27,6 +27,12 @@ import { closeTooltip, openTooltip } from "../../store/tooltip";
 import { openContextMenu } from "../../store/contextMenu";
 import { openComponentsModal } from "../../store/weaponComponents";
 import { useMergeRefs } from "@floating-ui/react";
+import {
+  buildOccupancyMap,
+  canPlace,
+  getItemSize,
+  isTetrisType,
+} from "../../helpers/grid";
 
 interface SlotProps {
   inventoryId: Inventory["id"];
@@ -39,6 +45,21 @@ interface SlotProps {
   // gets the bigger "card" treatment (image + name + weight + rarity)
   // unless explicitly marked compact.
   compact?: boolean;
+  // Explicit CSS grid placement (e.g. "3 / span 2") for tetris-style
+  // multi-cell items — see InventoryGrid.tsx. Omit for auto-flow (hotbar,
+  // the 3x3 workbench grid, shop, etc — anywhere every slot is 1x1).
+  gridColumn?: string;
+  gridRow?: string;
+  // The EFFECTIVE size this slot is being rendered at — not necessarily
+  // the item's "real" footprint. A 2x2 backpack dropped into the hotbar
+  // still only occupies 1x1 there (see gridColumn/gridRow above, which
+  // simply won't be set to a span >1 in that case) — InventorySlot must
+  // not re-derive size from the item's own data.grid and get this wrong,
+  // which is exactly what caused it to show the big-item name/weight card
+  // even inside the hotbar. Defaults to 1x1 (matches every non-tetris
+  // caller, which never passes this at all).
+  itemWidth?: number;
+  itemHeight?: number;
 }
 
 const CARD_STYLE_TYPES = new Set([
@@ -54,10 +75,37 @@ const CARD_STYLE_TYPES = new Set([
 const InventorySlot: React.ForwardRefRenderFunction<
   HTMLDivElement,
   SlotProps
-> = ({ item, inventoryId, inventoryType, inventoryGroups, compact }, ref) => {
+> = (
+  {
+    item,
+    inventoryId,
+    inventoryType,
+    inventoryGroups,
+    compact,
+    gridColumn,
+    gridRow,
+    itemWidth = 1,
+    itemHeight = 1,
+  },
+  ref,
+) => {
   const manager = useDragDropManager();
   const dispatch = useAppDispatch();
   const timerRef = useRef<number | null>(null);
+
+  // Only read when we're actually a tetris-enabled slot (see canDrop below)
+  // — selecting the whole items array on every render for every slot would
+  // be wasteful otherwise.
+  const targetInventoryItems = useAppSelector((state) =>
+    inventoryType === InventoryType.PLAYER
+      ? state.inventory.leftInventory.items
+      : state.inventory.rightInventory.items,
+  );
+  const targetInventorySlots = useAppSelector((state) =>
+    inventoryType === InventoryType.PLAYER
+      ? state.inventory.leftInventory.slots
+      : state.inventory.rightInventory.slots,
+  );
 
   const canDrag = useCallback(() => {
     return (
@@ -92,11 +140,16 @@ const InventorySlot: React.ForwardRefRenderFunction<
     [inventoryType, item],
   );
 
-  const [{ isOver }, drop] = useDrop<DragSource, void, { isOver: boolean }>(
+  const [{ isOver, canDrop: dropFits }, drop] = useDrop<
+    DragSource,
+    void,
+    { isOver: boolean; canDrop: boolean }
+  >(
     () => ({
       accept: "SLOT",
       collect: (monitor) => ({
         isOver: monitor.isOver(),
+        canDrop: monitor.canDrop(),
       }),
       drop: (source) => {
         dispatch(closeTooltip());
@@ -121,11 +174,36 @@ const InventorySlot: React.ForwardRefRenderFunction<
             break;
         }
       },
-      canDrop: (source) =>
-        (source.item.slot !== item.slot ||
-          source.inventory !== inventoryType) &&
-        inventoryType !== InventoryType.SHOP &&
-        inventoryType !== InventoryType.CRAFTING,
+      canDrop: (source) => {
+        const basicChecks =
+          (source.item.slot !== item.slot ||
+            source.inventory !== inventoryType) &&
+          inventoryType !== InventoryType.SHOP &&
+          inventoryType !== InventoryType.CRAFTING;
+
+        if (!basicChecks) return false;
+
+        // Tetris fit preview — purely a UX hint (green/red border) so
+        // dropping somewhere that obviously won't fit is disabled before
+        // the user lets go, not a security boundary. The server
+        // (modules/inventory/grid.lua) always re-checks the real move
+        // independently and is the actual source of truth.
+        if (!isTetrisType(inventoryType, inventoryId)) return true;
+
+        const sourceItemData = Items[source.item.name];
+        if (!sourceItemData) return true;
+
+        const [w, h] = getItemSize(source.item.name);
+        const sameInventory = source.inventory === inventoryType;
+        const occupancy = buildOccupancyMap(
+          targetInventoryItems,
+          inventoryType,
+          inventoryId,
+          sameInventory ? source.item.slot : undefined,
+        );
+
+        return canPlace(item.slot, w, h, occupancy, targetInventorySlots);
+      },
     }),
     [inventoryType, item],
   );
@@ -196,7 +274,14 @@ const InventorySlot: React.ForwardRefRenderFunction<
   const refs = useMergeRefs([connectRef, ref]);
 
   const rarity = isSlotWithItem(item) ? Items[item.name]?.rarity : undefined;
-  const showCard = !compact && CARD_STYLE_TYPES.has(inventoryType);
+  // Small 1x1 items stay icon-only at this cell size (hover for details,
+  // same as real Tarkov) — only items actually being rendered as bigger
+  // than one cell (see itemWidth/itemHeight above) have room to keep the
+  // name/weight footer readable.
+  const showCard =
+    !compact &&
+    CARD_STYLE_TYPES.has(inventoryType) &&
+    (itemWidth > 1 || itemHeight > 1);
 
   const backgroundLayers = [
     `url(${item?.name ? getItemUrl(item as SlotWithItem) : "none"})`,
@@ -212,7 +297,7 @@ const InventorySlot: React.ForwardRefRenderFunction<
       ref={refs}
       onContextMenu={handleContext}
       onClick={handleClick}
-      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}${isOver ? " is-drop-target" : ""}${showCard ? " inventory-slot-card" : ""}`}
+      className={`inventory-slot${rarity ? ` rarity-${rarity}` : ""}${isOver ? ` is-drop-target${dropFits ? " can-fit" : " cannot-fit"}` : ""}${showCard ? " inventory-slot-card" : ""}`}
       style={{
         filter:
           !canPurchaseItem(item, {
@@ -223,6 +308,8 @@ const InventorySlot: React.ForwardRefRenderFunction<
             : undefined,
         opacity: isDragging ? 0.3 : 1.0,
         backgroundImage: backgroundLayers,
+        gridColumn,
+        gridRow,
       }}
     >
       {isSlotWithItem(item) && (

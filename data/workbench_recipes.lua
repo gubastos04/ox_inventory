@@ -27,7 +27,7 @@ return {
             'steel', 'wood', 'steel',
             'iron', 'steel', 'iron',
         },
-        result = { name = 'weapon_ak47', count = 1 },
+        result = { name = 'WEAPON_ASSAULTRIFLE', count = 1 },
     },
     {
         name = 'bandage_kit',

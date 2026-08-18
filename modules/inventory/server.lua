@@ -377,6 +377,7 @@ local function minimal(inv)
 end
 
 local Items = require 'modules.items.server'
+local Grid = require 'modules.inventory.grid'
 
 ---@param inv inventory
 ---@param item table | string
@@ -1768,6 +1769,38 @@ lib.callback.register('ox_inventory:swapItems', function(source, data)
 
         if data.toType == 'newdrop' then
             return dropItem(source, fromInventory, fromData, data)
+        end
+
+        -- Tetris placement check (player inventory outside the hotbar, and
+        -- drop/container/stash/trunk/glovebox — see modules/inventory/grid.lua).
+        -- Runs before any of the existing move/stack/swap logic below and
+        -- either lets it through unchanged or rejects early; it never
+        -- modifies how a move that passes is actually carried out.
+        if Grid.isTetrisType(toInventory) and data.toSlot ~= data.fromSlot then
+            local isSameItemStack = toData
+                and toData.name == fromData.name
+                and table.matches(toData.metadata, fromData.metadata)
+
+            if not isSameItemStack then
+                local fw, fh = Grid.getItemSize(fromData.name)
+                local ignoreSlot = sameInventory and data.fromSlot or nil
+
+                if toData then
+                    -- swapping with a different item already anchored here —
+                    -- only allow it when both items are plain 1x1s (the
+                    -- existing swap logic below just trades two slots; that's
+                    -- not safe to assume once footprints bigger than 1x1 are
+                    -- involved, so those swaps are rejected rather than risk
+                    -- an unvalidated overlap)
+                    local tw, th = Grid.getItemSize(toData.name)
+
+                    if fw > 1 or fh > 1 or tw > 1 or th > 1 then
+                        return false, 'tetris_no_space'
+                    end
+                elseif not Grid.canPlace(toInventory, data.toSlot, fw, fh, ignoreSlot) then
+                    return false, 'tetris_no_space'
+                end
+            end
         end
 
 		if fromData then

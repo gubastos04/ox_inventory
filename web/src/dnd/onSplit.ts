@@ -24,7 +24,12 @@ export const onSplit = (item: SlotWithItem, count: number) => {
   const candidates = sourceInventory.items.filter(
     (slot) => slot.slot !== sourceSlot.slot,
   );
-  const targetSlot = findAvailableSlot(sourceSlot, sourceData, candidates);
+  const targetSlot = findAvailableSlot(
+    sourceSlot,
+    sourceData,
+    candidates,
+    sourceInventory,
+  );
 
   if (!targetSlot)
     return console.warn("No available slot to split the stack into");

@@ -46,6 +46,7 @@ return {
 		weight = 8000,
 		stack = false,
 		rarity = 'epico',
+		grid = { width = 2, height = 3 },
 		client = {
 			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
 			usetime = 1500
@@ -110,6 +111,7 @@ return {
 		weight = 3000,
 		stack = false,
 		rarity = 'mitico',
+		grid = { width = 2, height = 2 },
 		client = {
 			anim = { dict = 'clothingshirt', clip = 'try_shirt_positive_d' },
 			usetime = 3500

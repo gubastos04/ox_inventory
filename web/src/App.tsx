@@ -76,7 +76,7 @@ debugData([
       leftInventory: {
         id: "test",
         type: "player",
-        slots: 42,
+        slots: 60,
         label: "Bob Smith",
         weight: 0,
         maxWeight: 30000,
@@ -199,6 +199,13 @@ debugData([
               label: "Blueprint: AK-47 Frame",
             },
           },
+
+          // tetris footprint check — placed past the hotbar/weapon slots so
+          // they land in the real grid area: a 2x3 (parachute) and a 2x2
+          // (armour) should visibly span multiple cells here, unlike their
+          // 1x1 hotbar counterparts above
+          { slot: 25, name: "parachute", weight: 8000, count: 1 },
+          { slot: 31, name: "armour", weight: 3000, count: 1 },
         ],
       },
       rightInventory: DEBUG_WORKBENCH
@@ -206,7 +213,7 @@ debugData([
         : {
             id: "stash-test",
             type: "stash",
-            slots: 84,
+            slots: 90,
             label: "Baú de Testes",
             weight: 5476,
             maxWeight: 20000,

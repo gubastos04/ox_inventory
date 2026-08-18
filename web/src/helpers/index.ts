@@ -11,6 +11,13 @@ import { store } from "../store";
 import { Items } from "../store/items";
 import { imagepath } from "../store/imagepath";
 import { fetchNui } from "../utils/fetchNui";
+import {
+  buildOccupancyMap,
+  findFirstFit,
+  getItemSize,
+  HOTBAR_SIZE,
+  isTetrisType,
+} from "./grid";
 
 export const canPurchaseItem = (
   item: Slot,
@@ -106,15 +113,43 @@ export const findAvailableSlot = (
   item: Slot,
   data: ItemData,
   items: Slot[],
+  targetInventory?: Inventory,
 ) => {
-  if (!data.stack) return items.find((target) => target.name === undefined);
+  const stackableSlot = data.stack
+    ? items.find(
+        (target) =>
+          target.name === item.name && isEqual(target.metadata, item.metadata),
+      )
+    : undefined;
 
-  const stackableSlot = items.find(
-    (target) =>
-      target.name === item.name && isEqual(target.metadata, item.metadata),
-  );
+  if (stackableSlot) return stackableSlot;
 
-  return stackableSlot || items.find((target) => target.name === undefined);
+  // Tetris-enabled target (player/drop/container/stash/trunk/glovebox, but
+  // not the workbench or anywhere else 1-slot-per-cell still applies) —
+  // "first empty slot number" isn't good enough here, since a numbered
+  // slot can be nominally unassigned yet still sit inside a bigger
+  // neighboring item's footprint. This is a UX nicety, not the security
+  // boundary — the server (modules/inventory/grid.lua) always re-validates
+  // the actual chosen slot regardless of what this picks.
+  if (
+    targetInventory &&
+    isTetrisType(targetInventory.type, targetInventory.id)
+  ) {
+    const [w, h] = getItemSize(item.name);
+    const occupancy = buildOccupancyMap(
+      items,
+      targetInventory.type,
+      targetInventory.id,
+    );
+    const isPlayer = targetInventory.type === InventoryType.PLAYER;
+    const startSlot = isPlayer ? HOTBAR_SIZE + 1 : 1;
+    const fit = findFirstFit(w, h, occupancy, targetInventory.slots, startSlot);
+
+    if (fit !== null) return items.find((target) => target.slot === fit);
+    return undefined;
+  }
+
+  return items.find((target) => target.name === undefined);
 };
 
 export const getTargetInventory = (

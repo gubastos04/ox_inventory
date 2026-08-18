@@ -37,6 +37,7 @@ export const Items: {
     count: 0,
     description: "Allows communication over a set frequency with your group.",
     rarity: "raro",
+    grid: { width: 1, height: 2 },
   },
   parachute: {
     name: "parachute",
@@ -47,6 +48,7 @@ export const Items: {
     count: 0,
     description: "Deploys automatically when falling from a great height.",
     rarity: "epico",
+    grid: { width: 2, height: 3 },
   },
   lockpick: {
     name: "lockpick",
@@ -68,6 +70,7 @@ export const Items: {
     count: 0,
     description: "Reduces damage from bullets. Level II protection.",
     rarity: "mitico",
+    grid: { width: 2, height: 2 },
   },
 
   // ---------- misc / supporting items ----------

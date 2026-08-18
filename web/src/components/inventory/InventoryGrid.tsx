@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Inventory, InventoryType } from "../../typings";
+import { Inventory, InventoryType, Slot } from "../../typings";
 import WeightBar, { getLoadColor } from "../utils/WeightBar";
 import InventorySlot from "./InventorySlot";
-import { getTotalWeight } from "../../helpers";
+import { getTotalWeight, isSlotWithItem } from "../../helpers";
 import { useAppDispatch, useAppSelector } from "../../store";
 import { useIntersection } from "../../hooks/useIntersection";
 import { fetchNui } from "../../utils/fetchNui";
@@ -17,14 +17,18 @@ import ScaleIcon from "../utils/icons/Scaleicon";
 import GroundIcon from "../utils/icons/Groundicon";
 import BoxIcon from "../utils/icons/Boxicon";
 import ArrowIcon from "../utils/icons/Arrowicon";
+import {
+  GRID_COLS,
+  HOTBAR_SIZE,
+  buildOccupancyMap,
+  getItemSize,
+} from "../../helpers/grid";
 
 const PAGE_SIZE = 30;
 
-const GRID_COLS = 7;
-const HOTBAR_SIZE = 7; // matches GRID_COLS so the hotbar row is always full-width
 const PLAYER_GRID_ROWS = 5; // fixed rows below the hotbar, always this tall (scrolls beyond)
 const CONTEXT_GRID_ROWS = 6; // fixed rows for drop/container/stash/trunk/glovebox, always this tall (scrolls beyond)
-const ROW_HEIGHT_VH = 11.92; // $gridSize (11.62vh) + 0.22vh
+const ROW_HEIGHT_VH = 5.42; // $gridSize (5.2vh) + 0.22vh
 const ROW_GAP_PX = 1; // $gridGap
 
 // Fixed-pixel chrome that eats into the viewport alongside the vh-based
@@ -105,6 +109,60 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const restItems = isPlayerInventory
     ? visibleItems.slice(HOTBAR_SIZE)
     : visibleItems;
+
+  // Tetris grid start: for the player, cell (0,0) of the "rest" grid sits
+  // right below hotbar slot 1 — HOTBAR_SIZE lines up with GRID_COLS exactly
+  // so that boundary always falls on a fresh row. For every other type the
+  // whole inventory (from slot 1) is the tetris grid.
+  const gridStartSlot = isPlayerInventory ? HOTBAR_SIZE + 1 : 1;
+
+  const occupancy = useMemo(
+    () => buildOccupancyMap(restItems, inventory.type, inventory.id),
+    [restItems, inventory.type, inventory.id],
+  );
+
+  // Renders every "rest" slot explicitly positioned on the CSS grid instead
+  // of relying on DOM-order auto-flow — items bigger than 1x1 need an exact
+  // column/row + span, and the cells they cover have to be skipped entirely
+  // rather than rendered as their own (phantom) empty slot underneath them.
+  const renderRestItems = () => {
+    const nodes: React.ReactNode[] = [];
+
+    restItems.forEach((item, index) => {
+      // covered by a neighboring item's footprint, not its own anchor —
+      // nothing to render here, that space is already taken visually
+      if (!isSlotWithItem(item) && occupancy.has(item.slot)) return;
+
+      const relative = item.slot - gridStartSlot;
+      const col = ((relative % GRID_COLS) + GRID_COLS) % GRID_COLS;
+      const row = Math.floor(relative / GRID_COLS);
+      const [w, h] = isSlotWithItem(item) ? getItemSize(item.name) : [1, 1];
+
+      nodes.push(
+        <InventorySlot
+          key={`${inventory.type}-${inventory.id}-${item.slot}`}
+          item={item}
+          ref={index === restItems.length - 1 ? ref : null}
+          inventoryType={inventory.type}
+          inventoryGroups={inventory.groups}
+          inventoryId={inventory.id}
+          gridColumn={`${col + 1} / span ${w}`}
+          gridRow={`${row + 1} / span ${h}`}
+          itemWidth={w}
+          itemHeight={h}
+        />,
+      );
+    });
+
+    return nodes;
+  };
+
+  // Both panels always render at this fixed row count, full stop — not
+  // shrunk for inventories with fewer items, and not grown for ones with
+  // more (a 60-slot stash still shows only 6 rows and relies on the grid's
+  // own internal scrollbar for the rest, instead of the whole card growing
+  // to fit everything, which is what was pushing the panel off the bottom
+  // of the screen for bigger inventories).
   const rows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
 
   const percent = inventory.maxWeight
@@ -173,18 +231,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
           ref={containerRef}
           style={{ height: getContainerHeight(rows, isPlayerInventory) }}
         >
-          <>
-            {restItems.map((item, index) => (
-              <InventorySlot
-                key={`${inventory.type}-${inventory.id}-${item.slot}`}
-                item={item}
-                ref={index === restItems.length - 1 ? ref : null}
-                inventoryType={inventory.type}
-                inventoryGroups={inventory.groups}
-                inventoryId={inventory.id}
-              />
-            ))}
-          </>
+          {renderRestItems()}
         </div>
       </div>
     </>

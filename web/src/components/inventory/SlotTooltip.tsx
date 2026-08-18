@@ -3,7 +3,7 @@ import React, { Fragment, useMemo } from "react";
 import { Items } from "../../store/items";
 import { Locale } from "../../store/locale";
 import { useAppSelector } from "../../store";
-import ClockIcon from "../utils/icons/Clockicon";
+import ClockIcon from "../utils/icons/ClockIcon";
 import { getItemUrl } from "../../helpers";
 import Divider from "../utils/Divider";
 import Markdown from "../utils/Markdown";

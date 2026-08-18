@@ -10,8 +10,8 @@ export type ItemData = {
   ammoName?: string;
   image?: string;
   rarity?: Rarity;
-  /** only present on weapon-component items — which slot they attach to */
   type?: ComponentType;
+  grid?: { width?: number; height?: number };
 };
 
 export type Rarity =

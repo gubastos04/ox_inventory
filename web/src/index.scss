@@ -104,6 +104,9 @@ $gridCols: 7;
 $gridRows: 6;
 $gridSize: 11.69vh;
 $gridGap: 1px;
+$tetrisGridCols: 7;
+$tetrisGridSize: 10vh;
+$tetrisGridGap: 1px;
 $containerSize: calc(
   #{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap}
 );
@@ -641,9 +644,9 @@ body.inv-dragging {
 
 .inventory-grid-container {
   display: grid;
-  grid-template-columns: repeat($gridCols, $gridSize);
-  grid-auto-rows: $gridSize + 0.22vh;
-  gap: $gridGap;
+  grid-template-columns: repeat($tetrisGridCols, $tetrisGridSize);
+  grid-auto-rows: $tetrisGridSize + 0.22vh;
+  gap: $tetrisGridGap;
   overflow-y: scroll;
   flex: 1 1 auto;
   min-height: 0;
@@ -651,11 +654,11 @@ body.inv-dragging {
 
 .inventory-hotbar-row {
   display: grid;
-  height: $gridSize + 0.22vh;
+  height: $tetrisGridSize + 0.22vh;
   flex-shrink: 0;
-  grid-template-columns: repeat($gridCols, $gridSize);
-  grid-auto-rows: $gridSize + 0.22vh;
-  gap: $gridGap;
+  grid-template-columns: repeat($tetrisGridCols, $tetrisGridSize);
+  grid-auto-rows: $tetrisGridSize + 0.22vh;
+  gap: $tetrisGridGap;
   margin-bottom: $gridGap;
 }
 
@@ -906,7 +909,7 @@ body.inv-dragging {
     center,
     0% 100%;
   background-size:
-    7vh,
+    65%,
     100% 100%;
   border-radius: 0;
   image-rendering: -webkit-optimize-contrast;
@@ -929,6 +932,19 @@ body.inv-dragging {
     border-style: dashed;
     background-color: rgba(47, 147, 171, 0.1);
     box-shadow: 0 0 0 1px var(--color-petrol-glow);
+  }
+  &.is-drop-target.can-fit {
+    border-color: var(--color-emerald);
+    border-style: solid;
+    background-color: rgba(88, 199, 111, 0.15);
+    box-shadow: 0 0 0 1px var(--color-emerald);
+  }
+  &.is-drop-target.cannot-fit {
+    border-color: var(--color-red);
+    border-style: solid;
+    background-color: rgba(193, 39, 45, 0.15);
+    box-shadow: 0 0 0 1px var(--color-red);
+    cursor: not-allowed;
   }
 }
 
@@ -1448,7 +1464,7 @@ body.inv-dragging {
 
 .give-modal-confirm {
   background-color: $purpleDeep;
-  color: #000000;
+  color: $slotHoverColor;
   border-color: $purpleDeep !important;
   &:hover {
     background-color: $purple;
