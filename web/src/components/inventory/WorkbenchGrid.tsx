@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Inventory, Slot, WorkbenchRecipe } from "../../typings";
 import InventorySlot from "./InventorySlot";
 import WeightBar, { getLoadColor } from "../utils/WeightBar";
@@ -11,15 +12,17 @@ import ArrowIcon from "../utils/icons/Arrowicon";
 
 const GRID_SLOTS = 9;
 
-// Formats a recipe's result count for display — it's either a flat number
-// or a {min, max} range rolled server-side at craft time, so the UI just
-// shows the range as-is rather than pretending to know the exact roll.
 const formatCount = (count: number | [number, number]) =>
   Array.isArray(count) ? `${count[0]}-${count[1]}` : `${count}`;
 
 const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const recipes = inventory.recipes || [];
   const [isCrafting, setIsCrafting] = useState(false);
+  const [preview, setPreview] = useState<{
+    recipe: WorkbenchRecipe;
+    top: number;
+    left: number;
+  } | null>(null);
 
   const weight = useMemo(
     () => getTotalWeight(inventory.items),
@@ -30,9 +33,6 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     : 0;
   const weightColor = getLoadColor(percent);
 
-  // The 9 grid slots are always the first 9 items of this stash (it's
-  // registered with exactly 9 slots — see modules/workbench/server.lua),
-  // padded with empty slot placeholders server-side same as any inventory.
   const gridSlots: Slot[] = useMemo(() => {
     const slots: Slot[] = [];
     for (let i = 0; i < GRID_SLOTS; i++) {
@@ -115,9 +115,6 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
                 {matchedRecipe ? (
                   <>
                     <img src={getItemUrl(matchedRecipe.result.name)} alt="" />
-                    <span className="workbench-output-count">
-                      {formatCount(matchedRecipe.result.count)}
-                    </span>
                   </>
                 ) : (
                   <span className="workbench-output-placeholder">?</span>
@@ -149,38 +146,51 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
                 className={`workbench-recipe-entry${
                   matchedRecipe?.name === recipe.name ? " active" : ""
                 }`}
+                onMouseEnter={(e) => {
+                  const rect = e.currentTarget.getBoundingClientRect();
+                  setPreview({
+                    recipe,
+                    top: rect.top + rect.height / 2,
+                    left: rect.right + 4,
+                  });
+                }}
+                onMouseLeave={() => setPreview(null)}
               >
                 <img src={getItemUrl(recipe.result.name)} alt="" />
                 <span>{recipe.label}</span>
-
-                {/* Preview em hover: as receitas são "shaped" (posição
-                    importa, ver matchRecipe em modules/workbench/server.lua),
-                    então mostrar só a lista de ingredientes não bastava —
-                    precisa mostrar exatamente em qual das 9 células cada
-                    item vai. */}
-                <div className="workbench-recipe-preview">
-                  <p className="workbench-recipe-preview-title">
-                    {recipe.label}
-                  </p>
-                  <div className="workbench-recipe-preview-grid">
-                    {recipe.grid.map((name, i) => (
-                      <div key={i} className="workbench-recipe-preview-cell">
-                        {name && (
-                          <img
-                            src={getItemUrl(name)}
-                            alt={Items[name]?.label || name}
-                            title={Items[name]?.label || name}
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Fora da árvore do painel (portal pro <body>) de propósito — ver
+          comentário no useState de `preview` acima. */}
+      {preview &&
+        createPortal(
+          <div
+            className="workbench-recipe-preview"
+            style={{ top: preview.top, left: preview.left }}
+          >
+            <p className="workbench-recipe-preview-title">
+              {preview.recipe.label}
+            </p>
+            <div className="workbench-recipe-preview-grid">
+              {preview.recipe.grid.map((name, i) => (
+                <div key={i} className="workbench-recipe-preview-cell">
+                  {name && (
+                    <img
+                      src={getItemUrl(name)}
+                      alt={Items[name]?.label || name}
+                      title={Items[name]?.label || name}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

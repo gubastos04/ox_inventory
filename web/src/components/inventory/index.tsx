@@ -22,19 +22,17 @@ import Fade from "../utils/transitions/Fade";
 import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
-import InventoryHeader, { InventoryTab } from "./InventoryHeader";
+import InventoryHeader from "./InventoryHeader";
 import WorkbenchGrid from "./WorkbenchGrid";
 
 const Inventory: React.FC = () => {
   const [inventoryVisible, setInventoryVisible] = useState(false);
-  const [activeTab, setActiveTab] = useState<InventoryTab>("inventory");
   const dispatch = useAppDispatch();
   const rightInventory = useAppSelector(selectRightInventory);
 
   useNuiEvent<boolean>("setInventoryVisible", setInventoryVisible);
   useNuiEvent<false>("closeInventory", () => {
     setInventoryVisible(false);
-    setActiveTab("inventory");
     dispatch(closeContextMenu());
     dispatch(closeTooltip());
     dispatch(closeGiveModal());
@@ -64,27 +62,14 @@ const Inventory: React.FC = () => {
     <>
       <Fade in={inventoryVisible}>
         <div className="inventory-page">
-          <InventoryHeader activeTab={activeTab} onChangeTab={setActiveTab} />
+          <InventoryHeader />
 
           <div className="inventory-wrapper">
-            {activeTab === "inventory" && (
-              <>
-                <LeftInventory />
-                <RightInventory />
-              </>
-            )}
-
-            {activeTab === "crafting" && (
-              <>
-                <LeftInventory />
-                {rightInventory.isWorkbench ? (
-                  <WorkbenchGrid inventory={rightInventory} />
-                ) : (
-                  <div className="crafting-empty-placeholder">
-                    <p>Aproxime-se de uma bancada de crafting.</p>
-                  </div>
-                )}
-              </>
+            <LeftInventory />
+            {rightInventory.isWorkbench ? (
+              <WorkbenchGrid inventory={rightInventory} />
+            ) : (
+              <RightInventory />
             )}
 
             <Tooltip />

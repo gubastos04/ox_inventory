@@ -314,69 +314,11 @@ body.inv-dragging {
   margin: 0;
 }
 
-.inventory-header-nav {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.inventory-header-tab {
-  background: none;
-  border: none;
-  padding: 4px 0;
-  font-family: $mainFont;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: $textColor;
-  cursor: pointer;
-  position: relative;
-  transition: color var(--duration-hover) var(--ease-premium);
-
-  &::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -6px;
-    height: 1px;
-    background-color: var(--color-accent-primary);
-    transform: scaleX(0);
-    transition: transform var(--duration-fast) var(--ease-premium);
-  }
-
-  &:hover {
-    color: var(--color-off-white);
-  }
-
-  &.active {
-    color: var(--color-accent-primary);
-
-    &::after {
-      transform: scaleX(1);
-    }
-  }
-}
-
 .inventory-header-clock {
   font-family: $monoFont;
   font-size: 13px;
   color: $textColor;
   margin: 0;
-}
-
-.crafting-empty-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 626px;
-  color: $textColor;
-  font-size: 13px;
-  text-align: center;
-  border: 1px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  min-height: 200px;
 }
 
 .inventory-wrapper {
@@ -386,8 +328,8 @@ body.inv-dragging {
   align-items: flex-start;
   flex: 1;
   min-height: 0;
-  margin: 6vh 1vh;
-  gap: 3vh;
+  margin: 3vh 0;
+  gap: 1vh;
 }
 
 .inventory-control {
@@ -755,14 +697,6 @@ body.inv-dragging {
     font-weight: 700;
   }
 
-  .workbench-output-count {
-    font-family: $monoFont;
-    font-size: 11px;
-    font-weight: 600;
-    color: $textColor;
-    margin-top: 2px;
-  }
-
   &.has-match {
     cursor: pointer;
     border-color: var(--color-accent-primary);
@@ -772,16 +706,8 @@ body.inv-dragging {
       filter: none;
     }
 
-    .workbench-output-count {
-      color: var(--color-off-white);
-    }
-
     &:hover {
       background-color: var(--color-accent-primary);
-
-      .workbench-output-count {
-        color: var(--color-void);
-      }
     }
   }
 
@@ -830,7 +756,6 @@ body.inv-dragging {
   border-radius: 0;
   background-color: var(--color-surface);
   border: 1px solid transparent;
-  position: relative; // ancora o preview abaixo
 
   img {
     width: 24px;
@@ -849,20 +774,14 @@ body.inv-dragging {
   &.active {
     border-color: var(--color-accent-primary);
   }
-
-  &:hover .workbench-recipe-preview {
-    display: flex;
-  }
 }
 
 .workbench-recipe-preview {
-  display: none;
+  display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  position: absolute;
-  right: calc(100% + 8px);
-  top: 50%;
+  position: fixed;
   transform: translateY(-50%);
   z-index: 30;
   padding: 10px;
@@ -871,6 +790,7 @@ body.inv-dragging {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   white-space: normal;
+  pointer-events: none;
 }
 
 .workbench-recipe-preview-title {

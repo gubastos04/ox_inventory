@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-export type InventoryTab = "inventory" | "crafting";
-
-const TABS: { id: InventoryTab; label: string }[] = [
-  { id: "inventory", label: "Inventário" },
-  { id: "crafting", label: "Crafting" },
-];
-
 const useClock = () => {
   const [time, setTime] = useState(() =>
-    new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
+    new Date().toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+    }),
   );
 
   useEffect(() => {
@@ -27,27 +23,12 @@ const useClock = () => {
   return time;
 };
 
-const InventoryHeader: React.FC<{
-  activeTab: InventoryTab;
-  onChangeTab: (tab: InventoryTab) => void;
-}> = ({ activeTab, onChangeTab }) => {
+const InventoryHeader: React.FC = () => {
   const time = useClock();
 
   return (
     <div className="inventory-header">
       <p className="inventory-header-logo">Search RP</p>
-      <nav className="inventory-header-nav">
-        {TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            className={`inventory-header-tab${activeTab === tab.id ? " active" : ""}`}
-            onClick={() => onChangeTab(tab.id)}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </nav>
       <p className="inventory-header-clock">{time}</p>
     </div>
   );

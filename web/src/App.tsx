@@ -12,7 +12,7 @@ import { fetchNui } from "./utils/fetchNui";
 import { useDragDropManager } from "react-dnd";
 import KeyPress from "./components/utils/KeyPress";
 
-const DEBUG_WORKBENCH = false;
+const DEBUG_WORKBENCH = true;
 
 const workbenchRightInventory = {
   id: "workbench:debug",
@@ -225,7 +225,6 @@ debugData([
                 count: 1,
                 metadata: { durability: 45 },
               },
-              { slot: 2, name: "bandage", weight: 115, count: 3 },
               {
                 slot: 3,
                 name: "weapon_smg",
@@ -246,6 +245,7 @@ debugData([
                 metadata: { container: "debug-bag-02" },
               },
               { slot: 5, name: "lockpick", weight: 160, count: 1 },
+              { slot: 6, name: "bandage", weight: 115, count: 3 },
             ],
           },
     },
