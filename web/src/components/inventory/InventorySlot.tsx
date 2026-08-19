@@ -31,7 +31,7 @@ import {
   buildOccupancyMap,
   canPlace,
   getItemSize,
-  isTetrisType,
+  isTetrisSlot,
 } from "../../helpers/grid";
 
 interface SlotProps {
@@ -188,7 +188,14 @@ const InventorySlot: React.ForwardRefRenderFunction<
         // the user lets go, not a security boundary. The server
         // (modules/inventory/grid.lua) always re-checks the real move
         // independently and is the actual source of truth.
-        if (!isTetrisType(inventoryType, inventoryId)) return true;
+        //
+        // isTetrisSlot (not just isTetrisType!) matters here — the hotbar
+        // is part of a tetris-enabled 'player' inventory, but individual
+        // hotbar slots are still plain 1-per-slot. Checking only the
+        // inventory-level type was wrongly applying the item's full w x h
+        // footprint even when dropping into the hotbar, incorrectly
+        // blocking anything bigger than 1x1 from ever going back there.
+        if (!isTetrisSlot(inventoryType, inventoryId, item.slot)) return true;
 
         const sourceItemData = Items[source.item.name];
         if (!sourceItemData) return true;

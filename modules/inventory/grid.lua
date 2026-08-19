@@ -14,8 +14,8 @@
 
 local Items = require 'modules.items.server'
 
-local GRID_COLS = 10
-local HOTBAR_SIZE = 10
+local GRID_COLS = 9
+local HOTBAR_SIZE = 9
 
 local TETRIS_TYPES = {
     player = true,

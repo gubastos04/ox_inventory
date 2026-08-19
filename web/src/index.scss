@@ -102,10 +102,10 @@ $secondaryColorDark: rgba(0, 0, 0, 0.6);
 
 $gridCols: 7;
 $gridRows: 6;
-$gridSize: 11.69vh;
+$gridSize: 13vh;
 $gridGap: 1px;
 $tetrisGridCols: 7;
-$tetrisGridSize: 10vh;
+$tetrisGridSize: 8.2vh;
 $tetrisGridGap: 1px;
 $containerSize: calc(
   #{$gridRows} * #{$gridSize + 0.22vh} + #{$gridRows} * #{$gridGap}

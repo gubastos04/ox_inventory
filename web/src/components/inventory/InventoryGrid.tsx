@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Inventory, InventoryType, Slot } from "../../typings";
+import { useDrop } from "react-dnd";
+import { Inventory, InventoryType, Slot, DragSource } from "../../typings";
 import WeightBar, { getLoadColor } from "../utils/WeightBar";
 import InventorySlot from "./InventorySlot";
 import { getTotalWeight, isSlotWithItem } from "../../helpers";
@@ -12,40 +13,34 @@ import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
 import { Locale } from "../../store/locale";
+import { Items } from "../../store/items";
 import UserIcon from "../utils/icons/Usericon";
 import ScaleIcon from "../utils/icons/Scaleicon";
 import GroundIcon from "../utils/icons/Groundicon";
 import BoxIcon from "../utils/icons/Boxicon";
 import ArrowIcon from "../utils/icons/Arrowicon";
+import { onDrop as dispatchDrop } from "../../dnd/onDrop";
+import { onBuy } from "../../dnd/onBuy";
+import { onCraft } from "../../dnd/onCraft";
 import {
   GRID_COLS,
   HOTBAR_SIZE,
   buildOccupancyMap,
+  canPlace,
   getItemSize,
+  isTetrisType,
 } from "../../helpers/grid";
 
 const PAGE_SIZE = 30;
 
-const PLAYER_GRID_ROWS = 5; // fixed rows below the hotbar, always this tall (scrolls beyond)
-const CONTEXT_GRID_ROWS = 6; // fixed rows for drop/container/stash/trunk/glovebox, always this tall (scrolls beyond)
-const ROW_HEIGHT_VH = 5.42; // $gridSize (5.2vh) + 0.22vh
-const ROW_GAP_PX = 1; // $gridGap
+const PLAYER_GRID_ROWS = 9;
+const CONTEXT_GRID_ROWS = 10; 
+const ROW_HEIGHT_VH = 8.42; 
+const ROW_GAP_PX = 1;
 
-// Fixed-pixel chrome that eats into the viewport alongside the vh-based
-// grid rows: .inventory-header (64px) + this panel's own header row +
-// divider (~60px) + the .inventory-wrapper's vertical margin (2vh, folded
-// into the 98vh below). The player panel also has a hotbar row on top of
-// that. These are estimates with a little slack, not pixel-perfect — the
-// point of wrapping the result in min() below is that being a bit off just
-// means slightly-early scrolling, never actual overflow past the viewport.
 const PANEL_CHROME_PX = 64 + 60;
 const HOTBAR_ROW_PX_EQUIVALENT = `${ROW_HEIGHT_VH}vh + ${ROW_GAP_PX}px`;
 
-// Height for N rows, but never taller than what's actually left in the
-// viewport — this is what stops the card from being pushed off the bottom
-// of the screen on shorter/windowed viewports (see conversation history:
-// max-height on the wrapper alone doesn't reliably force a flex child to
-// shrink across browsers, so we compute the min() directly instead).
 const getContainerHeight = (rows: number, isPlayerInventory: boolean) => {
   const ideal = `${rows * ROW_HEIGHT_VH}vh + ${Math.max(0, rows - 1) * ROW_GAP_PX}px`;
   const chrome = isPlayerInventory
@@ -73,7 +68,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     [inventory.maxWeight, inventory.items],
   );
   const [page, setPage] = useState(0);
-  const containerRef = useRef(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const { ref, entry } = useIntersection({ threshold: 0.5 });
   const isBusy = useAppSelector((state) => state.inventory.isBusy);
 
@@ -120,6 +115,107 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     () => buildOccupancyMap(restItems, inventory.type, inventory.id),
     [restItems, inventory.type, inventory.id],
   );
+
+  // Container-level drop zone for the tetris grid — computed from the
+  // pointer's pixel position instead of "which numbered cell's own DOM
+  // element did you drop onto". This is what makes it possible to drop an
+  // item back onto a position that's currently covered by that SAME
+  // item's own footprint (e.g. nudging a 2x2 backpack over by one cell):
+  // covered cells aren't separate DOM elements at all (see renderRestItems
+  // below), so there'd be nothing to drop onto there with the old
+  // per-cell approach.
+  const [preview, setPreview] = useState<{
+    col: number;
+    row: number;
+    w: number;
+    h: number;
+    fits: boolean;
+    anchorSlot: number;
+  } | null>(null);
+
+  const computeDropPosition = (
+    source: DragSource,
+    monitor: { getClientOffset: () => { x: number; y: number } | null },
+  ) => {
+    const el = containerRef.current;
+    const offset = monitor.getClientOffset();
+    if (!el || !offset) return null;
+
+    const rect = el.getBoundingClientRect();
+    const [w, h] = getItemSize(source.item.name);
+    const cellPx = rect.width / GRID_COLS;
+
+    let col = Math.floor((offset.x - rect.left) / cellPx);
+    let row = Math.floor((offset.y - rect.top) / cellPx);
+    col = Math.max(0, Math.min(GRID_COLS - w, col));
+    row = Math.max(0, row);
+
+    const anchorSlot = gridStartSlot + row * GRID_COLS + col;
+    const sameInventory = source.inventory === inventory.type;
+    const dropOccupancy = buildOccupancyMap(
+      inventory.items,
+      inventory.type,
+      inventory.id,
+      sameInventory ? source.item.slot : undefined,
+    );
+    const fits = canPlace(anchorSlot, w, h, dropOccupancy, inventory.slots);
+
+    return { col, row, w, h, fits, anchorSlot };
+  };
+
+  const [{ isOverContainer }, gridDrop] = useDrop<
+    DragSource,
+    void,
+    { isOverContainer: boolean }
+  >(
+    () => ({
+      accept: "SLOT",
+      collect: (monitor) => ({ isOverContainer: monitor.isOver() }),
+      hover: (source, monitor) => {
+        if (!isTetrisType(inventory.type, inventory.id)) return;
+        const pos = computeDropPosition(source, monitor);
+        setPreview(pos);
+      },
+      drop: (source, monitor) => {
+        // A per-cell slot inside this same container (e.g. dropping onto
+        // an existing item's anchor to stack/swap) already handled this —
+        // don't also process it here, or the move would fire twice.
+        if (monitor.didDrop()) return;
+
+        const pos = preview;
+        setPreview(null);
+        if (!pos || !pos.fits) return;
+
+        dispatch(closeTooltip());
+        const target = {
+          inventory: inventory.type,
+          item: { slot: pos.anchorSlot },
+        };
+
+        switch (source.inventory) {
+          case InventoryType.SHOP:
+            onBuy(source, target);
+            break;
+          case InventoryType.CRAFTING:
+            onCraft(source, target);
+            break;
+          default:
+            dispatchDrop(source, target);
+            break;
+        }
+      },
+      canDrop: () => isTetrisType(inventory.type, inventory.id),
+    }),
+    [inventory.type, inventory.id, inventory.items, inventory.slots, preview],
+  );
+
+  // Clears the preview once the drag leaves the container (react-dnd has
+  // no dedicated "leave" callback on useDrop — isOver flipping back to
+  // false covers it) so a stale ghost box doesn't linger after a
+  // cancelled or dropped-elsewhere drag.
+  useEffect(() => {
+    if (!isOverContainer) setPreview(null);
+  }, [isOverContainer]);
 
   // Renders every "rest" slot explicitly positioned on the CSS grid instead
   // of relying on DOM-order auto-flow — items bigger than 1x1 need an exact
@@ -228,10 +324,22 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
 
         <div
           className="inventory-grid-container"
-          ref={containerRef}
+          ref={(node) => {
+            containerRef.current = node;
+            gridDrop(node);
+          }}
           style={{ height: getContainerHeight(rows, isPlayerInventory) }}
         >
           {renderRestItems()}
+          {preview && (
+            <div
+              className={`tetris-drop-preview${preview.fits ? " fits" : " blocked"}`}
+              style={{
+                gridColumn: `${preview.col + 1} / span ${preview.w}`,
+                gridRow: `${preview.row + 1} / span ${preview.h}`,
+              }}
+            />
+          )}
         </div>
       </div>
     </>
