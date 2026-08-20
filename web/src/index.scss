@@ -1,36 +1,29 @@
 :root {
-  // ---------- cor base (paleta "Search RP") ----------
-  --color-void: #0f1012; // background
-  --color-graphite: #151619; // surface — painéis, cards, modais
-  --color-graphite-soft: #1a1b1f; // variação sutil pra cabeçalhos internos
-  --color-surface: #1c1d21; // cinza escuro — slot vazio/ocupado
-  --color-surface-hover: #232428; // hover sobre superfície
-  --color-surface-active: #28282e; // pressed/selecionado
-  --color-border: #2a2c30; // border
-  --color-border-strong: #3d4047; // border hover
+  --color-void: #0f1012ce;
+  --color-graphite: #151619;
+  --color-graphite-soft: #1a1b1f;
+  --color-surface: #1c1d21;
+  --color-surface-hover: #232428;
+  --color-surface-active: #28282e;
+  --color-border: #2a2c30;
+  --color-border-strong: #3d4047;
 
-  --color-gray: #b2b2b2; // secondary — texto secundário
-  --color-gray-dim: #6b6b76; // texto terciário / desabilitado
-  --color-off-white: #f5f5f3; // white — texto primário
+  --color-gray: #b2b2b2;
+  --color-gray-dim: #6b6b76;
+  --color-off-white: #f5f5f3;
 
-  // ---------- accent ----------
-  --color-accent-primary: #f8edad; // dourado pálido — ações, destaque, foco
+  --color-accent-primary: #f8edad;
   --color-accent-primary-glow: rgba(248, 237, 173, 0.35);
-  --color-accent-secondary: #700143; // vinho — usado com moderação (selecionado/destaque forte)
+  --color-accent-secondary: #700143;
 
-  // ---------- cor semântica ----------
-  --color-emerald: #58c76f; // success
+  --color-emerald: #58c76f;
   --color-emerald-deep: #3a9b52;
-  --color-red: #c1272d; // danger
+  --color-red: #c1272d;
   --color-red-deep: #971e23;
-  --color-amber: #d9b55a; // warning
-
-  // accent de interação primária = accent primary do design system acima
+  --color-amber: #d9b55a;
   --color-petrol: var(--color-accent-primary);
   --color-petrol-deep: #d8c98a;
   --color-petrol-glow: var(--color-accent-primary-glow);
-
-  // ---------- raridades ----------
   --rarity-comum: #c6c6c6;
   --rarity-incomum: #59d36d;
   --rarity-raro: #4fa7ff;
@@ -38,47 +31,39 @@
   --rarity-lendario: #ffb547;
   --rarity-mitico: #ff315e;
 
-  // ---------- tipografia ----------
   --font-sans: "Inter", "SF Pro Display", "General Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-headline: "Bebas Neue", "Oswald", "Inter", sans-serif;
 
-  // ---------- espaçamento (base 8px) ----------
   --space-1: 4px;
   --space-2: 8px;
-  --space-3: 12px; // gap
-  --space-4: 16px; // card padding
-  --space-5: 24px; // padding
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
   --space-6: 32px;
   --space-7: 48px;
-
-  // ---------- raio ----------
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-full: 999px;
-
-  // ---------- elevação (muito suave — nunca glow) ----------
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.24);
   --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.4);
-
-  // ---------- movimento ----------
-  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1); // ease-out suave, sem bounce
-  --duration-fast: 150ms; // fade
-  --duration-hover: 100ms; // hover
+  --ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-hover: 100ms;
   --duration-base: 200ms;
   --duration-slow: 250ms;
   --scale-hover: 1.02;
 }
 
-// ---------- aliases SCSS (compatibilidade com o restante do arquivo) ----------
+
 $mainColor: var(--color-graphite);
 $textColor: var(--color-gray);
 $mainFont: var(--font-sans);
 $headerFont: var(
   --font-headline
-); // headlines: Bebas Neue/Oswald, tracking largo
+); 
 $monoFont: var(--font-mono);
 
 $slotColor: var(--color-surface);
@@ -87,7 +72,7 @@ $lineColor: var(--color-border);
 
 $purple: var(
   --color-petrol
-); // accent geral de interação (petróleo, não mais roxo)
+);
 $purpleDeep: var(--color-petrol-deep);
 $purpleGlow: var(--color-petrol-glow);
 
@@ -255,7 +240,6 @@ button:active {
   background-position: center;
   background-size: 7vh;
   border: 1px solid var(--color-petrol);
-  border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   opacity: 0.92;
   image-rendering: -webkit-optimize-contrast;
@@ -276,7 +260,6 @@ button:active {
 body.inv-dragging {
   cursor: grabbing;
 
-  // don't trigger the hover tooltip mid-drag; the slot itself stays a drop target
   .item-slot-wrapper {
     pointer-events: none;
   }
@@ -324,11 +307,11 @@ body.inv-dragging {
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
   flex: 1;
   min-height: 0;
-  margin: 3vh 0;
+  margin: 3vh;
   gap: 1vh;
 }
 
@@ -604,7 +587,6 @@ body.inv-dragging {
   margin-bottom: $gridGap;
 }
 
-// 3x3 "Minecraft-style" crafting workbench (see WorkbenchGrid.tsx)
 .workbench-wrapper {
   min-width: 640px;
 }
@@ -821,7 +803,7 @@ body.inv-dragging {
   }
 }
 
-// inventory slots
+
 .inventory-slot {
   background-color: var(--color-surface);
   background-repeat: no-repeat, no-repeat;
@@ -1088,7 +1070,7 @@ body.inv-dragging {
   }
 }
 
-// hotbar
+
 .hotbar-container {
   display: flex;
   align-items: center;
@@ -1111,7 +1093,6 @@ body.inv-dragging {
   justify-content: space-between;
 }
 
-// item notifications
 
 .item-notification-container {
   display: flex;
@@ -1230,7 +1211,6 @@ body.inv-dragging {
   transition: all 200ms;
 }
 
-// ---------- give item modal ----------
 .give-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -1392,7 +1372,6 @@ body.inv-dragging {
   }
 }
 
-// ---------- weapon components modal ----------
 .components-modal {
   width: 320px;
 }

@@ -189,16 +189,6 @@ debugData([
           { slot: 16, name: "iron", weight: 100, count: 10 },
           { slot: 17, name: "steel", weight: 150, count: 10 },
           { slot: 18, name: "wood", weight: 200, count: 10 },
-          {
-            slot: 19,
-            name: "blueprint",
-            weight: 10,
-            count: 1,
-            metadata: {
-              recipes: ["ak47_frame"],
-              label: "Blueprint: AK-47 Frame",
-            },
-          },
 
           // tetris footprint check — placed past the hotbar/weapon slots so
           // they land in the real grid area: a 2x3 (parachute) and a 2x2
