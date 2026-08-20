@@ -33,8 +33,8 @@ import {
 
 const PAGE_SIZE = 30;
 
-const PLAYER_GRID_ROWS = 9;
-const CONTEXT_GRID_ROWS = 10; 
+const PLAYER_GRID_ROWS = 8;
+const CONTEXT_GRID_ROWS = 9; 
 const ROW_HEIGHT_VH = 8.42; 
 const ROW_GAP_PX = 1;
 

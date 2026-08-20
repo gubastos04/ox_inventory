@@ -12,8 +12,8 @@ import { Slot } from "../typings";
   InventoryGrid.tsx and modules/inventory/grid.lua.
 */
 
-export const GRID_COLS = 10;
-export const HOTBAR_SIZE = 10;
+export const GRID_COLS = 7;
+export const HOTBAR_SIZE = 7;
 
 const TETRIS_TYPES = new Set([
   "player",

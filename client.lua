@@ -927,7 +927,7 @@ local function registerCommands()
 		end
 	})
 
-	for i = 1, 5 do
+	for i = 1, 7 do
 		lib.addKeybind({
 			name = ('hotkey%s'):format(i),
 			description = locale('use_hotbar', i),
