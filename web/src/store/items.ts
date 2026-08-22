@@ -92,6 +92,34 @@ export const Items: {
     count: 0,
     rarity: "comum",
   },
+  // ---------- Workbench items ----------
+  iron: {
+    name: "Iron",
+    close: false,
+    label: "Barra de ferro",
+    stack: true,
+    usable: false,
+    count: 0,
+    rarity: "comum",
+  },
+  steel: {
+    name: "steel",
+    close: false,
+    label: "Barra de aço",
+    stack: true,
+    usable: false,
+    count: 0,
+    rarity: "comum",
+  },
+  wood: {
+    name: "Wood",
+    close: false,
+    label: "Tabua de madeira",
+    stack: true,
+    usable: false,
+    count: 0,
+    rarity: "comum",
+  },
 
   // ---------- 6 weapons, each with a different component loadout ----------
   weapon_pistol: {

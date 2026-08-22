@@ -82,7 +82,7 @@ $secondaryColorDark: rgba(0, 0, 0, 0.6);
 
 $gridCols: 7;
 $gridRows: 7;
-$gridSize: 13vh;
+$gridSize: 8.2vh;
 $gridGap: 1px;
 $tetrisGridCols: 7;
 $tetrisGridSize: 8.2vh;
@@ -302,12 +302,11 @@ body.inv-dragging {
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: flex-start;
   flex: 1;
   min-height: 0;
-  margin: 3vh;
-  gap: 5rem;
+  margin: 3vh 12vh;
 }
 
 .inventory-control {

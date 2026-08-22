@@ -12,7 +12,7 @@ import { fetchNui } from "./utils/fetchNui";
 import { useDragDropManager } from "react-dnd";
 import KeyPress from "./components/utils/KeyPress";
 
-const DEBUG_WORKBENCH = false;
+const DEBUG_WORKBENCH = true;
 
 const workbenchRightInventory = {
   id: "workbench:debug",
@@ -37,7 +37,7 @@ const workbenchRightInventory = {
         "steel",
         "iron",
       ],
-      result: { name: "weapon_ak47", count: 1 },
+      result: { name: "weapon_assaultrifle", count: 1 },
     },
     {
       name: "bandage_kit",

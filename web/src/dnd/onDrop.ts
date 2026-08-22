@@ -50,11 +50,15 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
 
   const targetSlot = target
     ? targetInventory.items[target.item.slot - 1]
-    : findAvailableSlot(sourceSlot, sourceData, targetInventory.items, targetInventory);
+    : findAvailableSlot(
+        sourceSlot,
+        sourceData,
+        targetInventory.items,
+        targetInventory,
+      );
 
   if (targetSlot === undefined) return console.error("Target slot undefined!");
 
-  // If dropping on container slot when opened
   if (
     targetSlot.metadata?.container !== undefined &&
     state.rightInventory.id === targetSlot.metadata.container
@@ -63,14 +67,23 @@ export const onDrop = (source: DragSource, target?: DropTarget) => {
       `Cannot swap item ${sourceSlot.name} with container ${targetSlot.name} when opened`,
     );
 
-  const count =
-    state.shiftPressed &&
-    sourceSlot.count > 1 &&
-    sourceInventory.type !== "shop"
+  const count = (() => {
+    if (
+      targetInventory.isWorkbench &&
+      !isSlotWithItem(targetSlot, true) &&
+      sourceSlot.count > 1
+    ) {
+      return 1;
+    }
+
+    return state.shiftPressed &&
+      sourceSlot.count > 1 &&
+      sourceInventory.type !== "shop"
       ? Math.floor(sourceSlot.count / 2)
       : state.itemAmount === 0 || state.itemAmount > sourceSlot.count
         ? sourceSlot.count
         : state.itemAmount;
+  })();
 
   const data = {
     fromSlot: sourceSlot,
