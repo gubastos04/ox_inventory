@@ -19,15 +19,21 @@ export const onSplit = (item: SlotWithItem, count: number) => {
   if (sourceData === undefined)
     return console.error(`${sourceSlot.name} item data undefined!`);
 
-  // exclude the source slot itself, otherwise a stackable item with no other
-  // matching stack around would "find" itself as the target
-  const candidates = sourceInventory.items.filter(
-    (slot) => slot.slot !== sourceSlot.slot,
-  );
+  // Used to filter the source's own slot out of the whole items array
+  // before searching — but that made it disappear from occupancy too, so
+  // the fresh-space search saw the source's own slot as "unoccupied" (it's
+  // simply absent from the list) and happily picked it as the target...
+  // which then couldn't be resolved back to a real Slot object, since it
+  // really isn't in that filtered array — every split failed with "No
+  // available slot to split the stack into", even with the rest of the
+  // inventory sitting empty. findAvailableSlot excludes the source's own
+  // slot itself now (see helpers/index.ts), so the full array — with the
+  // source's slot correctly still marked occupied — is what should be
+  // passed through here.
   const targetSlot = findAvailableSlot(
     sourceSlot,
     sourceData,
-    candidates,
+    sourceInventory.items,
     sourceInventory,
   );
 

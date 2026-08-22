@@ -118,7 +118,9 @@ export const findAvailableSlot = (
   const stackableSlot = data.stack
     ? items.find(
         (target) =>
-          target.name === item.name && isEqual(target.metadata, item.metadata),
+          target.slot !== item.slot &&
+          target.name === item.name &&
+          isEqual(target.metadata, item.metadata),
       )
     : undefined;
 
@@ -136,12 +138,20 @@ export const findAvailableSlot = (
     isTetrisType(targetInventory.type, targetInventory.id)
   ) {
     const [w, h] = getItemSize(item.name);
+    const isPlayer = targetInventory.type === InventoryType.PLAYER;
+
+    if (isPlayer && w <= 1 && h <= 1) {
+      const freeHotbarSlot = items.find(
+        (target) => target.slot <= HOTBAR_SIZE && target.name === undefined,
+      );
+      if (freeHotbarSlot) return freeHotbarSlot;
+    }
+
     const occupancy = buildOccupancyMap(
       items,
       targetInventory.type,
       targetInventory.id,
     );
-    const isPlayer = targetInventory.type === InventoryType.PLAYER;
     const startSlot = isPlayer ? HOTBAR_SIZE + 1 : 1;
     const fit = findFirstFit(w, h, occupancy, targetInventory.slots, startSlot);
 
