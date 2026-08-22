@@ -34,8 +34,8 @@ import {
 const PAGE_SIZE = 30;
 
 const PLAYER_GRID_ROWS = 8;
-const CONTEXT_GRID_ROWS = 9; 
-const ROW_HEIGHT_VH = 8.42; 
+const CONTEXT_GRID_ROWS = 9;
+const ROW_HEIGHT_VH = 8.42;
 const ROW_GAP_PX = 1;
 
 const PANEL_CHROME_PX = 64 + 60;
@@ -80,11 +80,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   const isContainer = inventory.type === InventoryType.CONTAINER;
   const canGoBack = !!inventory.canGoBack;
 
-  // Closes the container — or, if it was opened on top of something else
-  // (the ground, an outer bag, a stash...), steps back to that instead of
-  // closing the whole inventory. The server decides which one happens
-  // (see the 'backContainer' NUI callback), so we just ask and clean up
-  // anything that shouldn't carry over (tooltip, context menu, modals).
   const closeContainer = () => {
     dispatch(closeTooltip());
     dispatch(closeContextMenu());
@@ -105,10 +100,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     ? visibleItems.slice(HOTBAR_SIZE)
     : visibleItems;
 
-  // Tetris grid start: for the player, cell (0,0) of the "rest" grid sits
-  // right below hotbar slot 1 — HOTBAR_SIZE lines up with GRID_COLS exactly
-  // so that boundary always falls on a fresh row. For every other type the
-  // whole inventory (from slot 1) is the tetris grid.
   const gridStartSlot = isPlayerInventory ? HOTBAR_SIZE + 1 : 1;
 
   const occupancy = useMemo(
@@ -116,14 +107,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     [restItems, inventory.type, inventory.id],
   );
 
-  // Container-level drop zone for the tetris grid — computed from the
-  // pointer's pixel position instead of "which numbered cell's own DOM
-  // element did you drop onto". This is what makes it possible to drop an
-  // item back onto a position that's currently covered by that SAME
-  // item's own footprint (e.g. nudging a 2x2 backpack over by one cell):
-  // covered cells aren't separate DOM elements at all (see renderRestItems
-  // below), so there'd be nothing to drop onto there with the old
-  // per-cell approach.
   const [preview, setPreview] = useState<{
     col: number;
     row: number;
@@ -209,25 +192,25 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
     [inventory.type, inventory.id, inventory.items, inventory.slots, preview],
   );
 
-  // Clears the preview once the drag leaves the container (react-dnd has
-  // no dedicated "leave" callback on useDrop — isOver flipping back to
-  // false covers it) so a stale ghost box doesn't linger after a
-  // cancelled or dropped-elsewhere drag.
   useEffect(() => {
     if (!isOverContainer) setPreview(null);
   }, [isOverContainer]);
 
-  // Renders every "rest" slot explicitly positioned on the CSS grid instead
-  // of relying on DOM-order auto-flow — items bigger than 1x1 need an exact
-  // column/row + span, and the cells they cover have to be skipped entirely
-  // rather than rendered as their own (phantom) empty slot underneath them.
   const renderRestItems = () => {
     const nodes: React.ReactNode[] = [];
 
-    restItems.forEach((item, index) => {
-      // covered by a neighboring item's footprint, not its own anchor —
-      // nothing to render here, that space is already taken visually
+    let lastRenderedIndex = -1;
+    restItems.forEach((item) => {
+      if (isSlotWithItem(item) || !occupancy.has(item.slot)) {
+        lastRenderedIndex += 1;
+      }
+    });
+    let renderedIndex = -1;
+
+    restItems.forEach((item) => {
       if (!isSlotWithItem(item) && occupancy.has(item.slot)) return;
+
+      renderedIndex += 1;
 
       const relative = item.slot - gridStartSlot;
       const col = ((relative % GRID_COLS) + GRID_COLS) % GRID_COLS;
@@ -238,7 +221,7 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
         <InventorySlot
           key={`${inventory.type}-${inventory.id}-${item.slot}`}
           item={item}
-          ref={index === restItems.length - 1 ? ref : null}
+          ref={renderedIndex === lastRenderedIndex ? ref : null}
           inventoryType={inventory.type}
           inventoryGroups={inventory.groups}
           inventoryId={inventory.id}
@@ -252,13 +235,6 @@ const InventoryGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
 
     return nodes;
   };
-
-  // Both panels always render at this fixed row count, full stop — not
-  // shrunk for inventories with fewer items, and not grown for ones with
-  // more (a 60-slot stash still shows only 6 rows and relies on the grid's
-  // own internal scrollbar for the rest, instead of the whole card growing
-  // to fit everything, which is what was pushing the panel off the bottom
-  // of the screen for bigger inventories).
   const rows = isPlayerInventory ? PLAYER_GRID_ROWS : CONTEXT_GRID_ROWS;
 
   const percent = inventory.maxWeight

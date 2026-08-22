@@ -1,5 +1,5 @@
 :root {
-  --color-void: #0f1012ce;
+  --color-void: #0f1012;
   --color-graphite: #151619;
   --color-graphite-soft: #1a1b1f;
   --color-surface: #1c1d21;
@@ -57,22 +57,17 @@
   --scale-hover: 1.02;
 }
 
-
 $mainColor: var(--color-graphite);
 $textColor: var(--color-gray);
 $mainFont: var(--font-sans);
-$headerFont: var(
-  --font-headline
-); 
+$headerFont: var(--font-headline);
 $monoFont: var(--font-mono);
 
 $slotColor: var(--color-surface);
 $slotHoverColor: var(--color-surface-hover);
 $lineColor: var(--color-border);
 
-$purple: var(
-  --color-petrol
-);
+$purple: var(--color-petrol);
 $purpleDeep: var(--color-petrol-deep);
 $purpleGlow: var(--color-petrol-glow);
 
@@ -307,12 +302,12 @@ body.inv-dragging {
 .inventory-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
   flex: 1;
   min-height: 0;
   margin: 3vh;
-  gap: 1vh;
+  gap: 5rem;
 }
 
 .inventory-control {
@@ -577,6 +572,24 @@ body.inv-dragging {
   min-height: 0;
 }
 
+.tetris-drop-preview {
+  pointer-events: none;
+  border-radius: 0;
+  z-index: 2;
+
+  &.fits {
+    border: 2px solid var(--color-emerald);
+    background-color: rgba(88, 199, 111, 0.2);
+    box-shadow: 0 0 0 1px var(--color-emerald);
+  }
+
+  &.blocked {
+    border: 2px solid var(--color-red);
+    background-color: rgba(193, 39, 45, 0.2);
+    box-shadow: 0 0 0 1px var(--color-red);
+  }
+}
+
 .inventory-hotbar-row {
   display: grid;
   height: $tetrisGridSize + 0.22vh;
@@ -802,7 +815,6 @@ body.inv-dragging {
     max-height: 70%;
   }
 }
-
 
 .inventory-slot {
   background-color: var(--color-surface);
@@ -1070,7 +1082,6 @@ body.inv-dragging {
   }
 }
 
-
 .hotbar-container {
   display: flex;
   align-items: center;
@@ -1092,7 +1103,6 @@ body.inv-dragging {
   flex-direction: row;
   justify-content: space-between;
 }
-
 
 .item-notification-container {
   display: flex;

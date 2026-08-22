@@ -39,25 +39,10 @@ interface SlotProps {
   inventoryType: Inventory["type"];
   inventoryGroups: Inventory["groups"];
   item: Slot;
-  // Keeps the small icon-only slot style (shop, the 3x3 workbench grid,
-  // weapon component picker, etc). Everything else — player inventory and
-  // the right-side context panel (drop/container/stash/trunk/glovebox) —
-  // gets the bigger "card" treatment (image + name + weight + rarity)
-  // unless explicitly marked compact.
+
   compact?: boolean;
-  // Explicit CSS grid placement (e.g. "3 / span 2") for tetris-style
-  // multi-cell items — see InventoryGrid.tsx. Omit for auto-flow (hotbar,
-  // the 3x3 workbench grid, shop, etc — anywhere every slot is 1x1).
   gridColumn?: string;
   gridRow?: string;
-  // The EFFECTIVE size this slot is being rendered at — not necessarily
-  // the item's "real" footprint. A 2x2 backpack dropped into the hotbar
-  // still only occupies 1x1 there (see gridColumn/gridRow above, which
-  // simply won't be set to a span >1 in that case) — InventorySlot must
-  // not re-derive size from the item's own data.grid and get this wrong,
-  // which is exactly what caused it to show the big-item name/weight card
-  // even inside the hotbar. Defaults to 1x1 (matches every non-tetris
-  // caller, which never passes this at all).
   itemWidth?: number;
   itemHeight?: number;
 }
@@ -147,10 +132,34 @@ const InventorySlot: React.ForwardRefRenderFunction<
   >(
     () => ({
       accept: "SLOT",
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-      }),
+      collect: (monitor) => {
+        const source = monitor.getItem();
+        let visualFits = monitor.canDrop();
+
+        if (
+          source &&
+          !visualFits &&
+          isTetrisSlot(inventoryType, inventoryId, item.slot)
+        ) {
+          const [w, h] = getItemSize(source.item.name);
+          const sameInventory = source.inventory === inventoryType;
+          const occupancy = buildOccupancyMap(
+            targetInventoryItems,
+            inventoryType,
+            inventoryId,
+            sameInventory ? source.item.slot : undefined,
+          );
+          visualFits = canPlace(
+            item.slot,
+            w,
+            h,
+            occupancy,
+            targetInventorySlots,
+          );
+        }
+
+        return { isOver: monitor.isOver(), canDrop: visualFits };
+      },
       drop: (source) => {
         dispatch(closeTooltip());
         switch (source.inventory) {
@@ -183,18 +192,6 @@ const InventorySlot: React.ForwardRefRenderFunction<
 
         if (!basicChecks) return false;
 
-        // Tetris fit preview — purely a UX hint (green/red border) so
-        // dropping somewhere that obviously won't fit is disabled before
-        // the user lets go, not a security boundary. The server
-        // (modules/inventory/grid.lua) always re-checks the real move
-        // independently and is the actual source of truth.
-        //
-        // isTetrisSlot (not just isTetrisType!) matters here — the hotbar
-        // is part of a tetris-enabled 'player' inventory, but individual
-        // hotbar slots are still plain 1-per-slot. Checking only the
-        // inventory-level type was wrongly applying the item's full w x h
-        // footprint even when dropping into the hotbar, incorrectly
-        // blocking anything bigger than 1x1 from ever going back there.
         if (!isTetrisSlot(inventoryType, inventoryId, item.slot)) return true;
 
         const sourceItemData = Items[source.item.name];
