@@ -1,5 +1,5 @@
 :root {
-  --color-void: #0f1012;
+  --color-void: #0f1012e8;
   --color-graphite: #151619;
   --color-graphite-soft: #1a1b1f;
   --color-surface: #1c1d21;
@@ -268,35 +268,6 @@ body.inv-dragging {
   position: fixed;
   inset: 0;
   background-color: var(--color-void);
-}
-
-.inventory-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 64px;
-  flex-shrink: 0;
-  padding: 0 3vh;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.inventory-header-logo {
-  font-family: $headerFont;
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: 4px;
-  color: var(--color-off-white);
-  text-transform: uppercase;
-  padding-left: 14px;
-  border-left: 2px solid var(--color-accent-secondary);
-  margin: 0;
-}
-
-.inventory-header-clock {
-  font-family: $monoFont;
-  font-size: 13px;
-  color: $textColor;
-  margin: 0;
 }
 
 .inventory-wrapper {

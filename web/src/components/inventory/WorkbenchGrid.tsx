@@ -65,11 +65,6 @@ const WorkbenchGrid: React.FC<{ inventory: Inventory }> = ({ inventory }) => {
   return (
     <div className="inventory-grid-wrapper workbench-wrapper">
       <div className="inventory-grid-header-wrapper">
-        {/* Sem título "Bancada de Craft" aqui de propósito: a aba "Crafting"
-            no header principal (InventoryHeader.tsx) já estabelece esse
-            contexto — repetir "craft" nos dois lugares empilhados era
-            redundante. A barra de peso continua porque é informação útil
-            de verdade (quanto da bancada — 900kg — já está ocupado). */}
         {inventory.maxWeight && (
           <div className="inventory-grid-weight-info">
             <span className="inventory-grid-icon">

@@ -22,7 +22,6 @@ import Fade from "../utils/transitions/Fade";
 import { closeGiveModal } from "../../store/giveItem";
 import { closeSplitModal } from "../../store/splitStack";
 import { closeComponentsModal } from "../../store/weaponComponents";
-import InventoryHeader from "./InventoryHeader";
 import WorkbenchGrid from "./WorkbenchGrid";
 
 const Inventory: React.FC = () => {
@@ -62,7 +61,6 @@ const Inventory: React.FC = () => {
     <>
       <Fade in={inventoryVisible}>
         <div className="inventory-page">
-          <InventoryHeader />
 
           <div className="inventory-wrapper">
             <LeftInventory />

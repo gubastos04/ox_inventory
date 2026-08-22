@@ -117,7 +117,19 @@ return {
 			usetime = 3500
 		}
 	},
+	["vehiclekey"] = {
+		label = "Vehicle Keys",
+		description = 'This is a car key, take good care of it, if you lose it you probably won\'t be able to use your car',
+		weight = 10,
+		stack = false
+	},
 
+	["keybag"] = {
+		label = "Key Bag",
+		description = 'This is a key bag, you can store all your keys in it',
+		weight = 10,
+		stack = false
+	},
 	-- Workbench crafting materials (examples — adjust weights/rarity/labels
 	-- as needed, or replace with your own item names in data/workbench_recipes.lua)
 	['iron'] = { label = 'Iron', weight = 100, rarity = 'comum' },
