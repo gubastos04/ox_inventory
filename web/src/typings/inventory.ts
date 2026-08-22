@@ -11,6 +11,7 @@ export enum InventoryType {
 export type WorkbenchRecipe = {
   name: string;
   label: string;
+  // 9 entries, left-to-right then top-to-bottom; false/undefined = empty cell
   grid: (string | false)[];
   result: {
     name: string;
@@ -19,7 +20,7 @@ export type WorkbenchRecipe = {
 };
 
 export type Inventory = {
-  id: string;
+  id: string | number;
   type: string;
   slots: number;
   items: Slot[];

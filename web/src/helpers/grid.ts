@@ -28,12 +28,25 @@ const TETRIS_TYPES = new Set([
 // The 3x3 crafting workbench is, under the hood, a personal 'stash' named
 // 'workbench:<identifier>' — it must stay a plain 1-slot-per-cell grid
 // regardless of that, so it's excluded here by id prefix rather than type.
-const isExcludedStash = (invId: string) => invId.startsWith("workbench:");
+//
+// invId isn't always a string at runtime despite the TS type saying so —
+// a player-type inventory's id is the player's raw server id (a number,
+// mirroring modules/inventory/server.lua, which doesn't string-suffix the
+// 'player' type). Calling .startsWith directly on that crashed the whole
+// bundle ("e.startsWith is not a function") the moment a player inventory
+// got involved, e.g. giving/receiving an item — String() first avoids that
+// regardless of what actually comes through.
+const isExcludedStash = (invId: string | number) =>
+  String(invId).startsWith("workbench:");
 
-export const isTetrisType = (invType: string, invId: string) =>
+export const isTetrisType = (invType: string, invId: string | number) =>
   TETRIS_TYPES.has(invType) && !isExcludedStash(invId);
 
-export const isTetrisSlot = (invType: string, invId: string, slot: number) => {
+export const isTetrisSlot = (
+  invType: string,
+  invId: string | number,
+  slot: number,
+) => {
   if (!isTetrisType(invType, invId)) return false;
   if (invType === "player" && slot <= HOTBAR_SIZE) return false;
   return true;
@@ -78,7 +91,7 @@ export const getOccupiedCells = (
 export const buildOccupancyMap = (
   items: Slot[],
   invType: string,
-  invId: string,
+  invId: string | number,
   ignoreAnchor?: number,
 ): Map<number, number> => {
   const occupancy = new Map<number, number>();
